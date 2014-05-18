@@ -4,7 +4,6 @@
 
 int instruct = 0;//表示当前遍历是否在结构体定义中
 char func_return[20];//记录当前遍历函数的返回类型
-
 void sem_analysis(node *p);
 
 /*void ParamDec_anly(node *p){//p is the first child of the ParamDec

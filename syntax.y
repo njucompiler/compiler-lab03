@@ -6,6 +6,7 @@
 #include <stdarg.h>
 #include "node.h"
 #include "lex.yy.c"
+#include "intercode.h"
 #include "semantic.h"
 
 void show_tree(node *p, int depth);
@@ -121,24 +122,24 @@ Dec	:	VarDec				{ $$ = reduction("Dec",@1.first_line, 1, $1); strcpy($$->node_va
 	|	VarDec ASSIGNOP Exp		{ $$ = reduction("Dec",@1.first_line, 3, $1, $2, $3); strcpy($$->node_value,$1->node_value);}
 	;
 Exp
-	:	Exp ASSIGNOP Exp		{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type = 7;}
-	|	Exp AND Exp			{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type = 8;}
-	|	Exp OR Exp			{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type = 9;}
-	|	Exp RELOP Exp			{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type = 10;}
-	|	Exp PLUS Exp			{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type = 11;}
-	|	Exp MINUS Exp			{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type = 12;}
-	|	Exp STAR Exp			{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type = 13;}
-	|	Exp DIV Exp			{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type = 14;}
-	|	LP Exp RP			{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type = 15;}
-	|	MINUS Exp			{ $$ = reduction("Exp",@1.first_line, 2, $1, $2); $$->type = 16;}
-	|	NOT Exp				{ $$ = reduction("Exp",@1.first_line, 2, $1, $2); $$->type = 17;}
-	|	ID LP Args RP			{ $$ = reduction("Exp",@1.first_line, 4, $1, $2, $3, $4); $$->type = 18;}
-	|	ID LP RP			{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type = 19;}
-	|	Exp LB Exp RB			{ $$ = reduction("Exp",@1.first_line, 4, $1, $2, $3, $4);$$->type = 20;}
-	|	Exp DOT ID			{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type = 21;}
-	|	ID				{ $$ = reduction("Exp",@1.first_line, 1, $1); $$->type = 22;}
-	|	INT				{ $$ = reduction("Exp",@1.first_line, 1, $1); $$->type = 23;}
-	|	FLOAT				{ $$ = reduction("Exp",@1.first_line, 1, $1); $$->type = 24;}
+	:	Exp ASSIGNOP Exp		{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type=$$->exp_type= 7;}
+	|	Exp AND Exp			{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type =$$->exp_type= 8;}
+	|	Exp OR Exp			{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type = $$->exp_type=9;}
+	|	Exp RELOP Exp			{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type = $$->exp_type=10;}
+	|	Exp PLUS Exp			{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type = $$->exp_type=11;}
+	|	Exp MINUS Exp			{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type = $$->exp_type=12;}
+	|	Exp STAR Exp			{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type = $$->exp_type=13;}
+	|	Exp DIV Exp			{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type = $$->exp_type=14;}
+	|	LP Exp RP			{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type = $$->exp_type=15;}
+	|	MINUS Exp			{ $$ = reduction("Exp",@1.first_line, 2, $1, $2); $$->type = $$->exp_type=16;}
+	|	NOT Exp				{ $$ = reduction("Exp",@1.first_line, 2, $1, $2); $$->type = $$->exp_type=17;}
+	|	ID LP Args RP			{ $$ = reduction("Exp",@1.first_line, 4, $1, $2, $3, $4); $$->type =$$->exp_type= 18;}
+	|	ID LP RP			{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type = $$->exp_type=19;}
+	|	Exp LB Exp RB			{ $$ = reduction("Exp",@1.first_line, 4, $1, $2, $3, $4);$$->type = $$->exp_type=20;}
+	|	Exp DOT ID			{ $$ = reduction("Exp",@1.first_line, 3, $1, $2, $3); $$->type = $$->exp_type=21;}
+	|	ID				{ $$ = reduction("Exp",@1.first_line, 1, $1); $$->type = $$->exp_type=22;}
+	|	INT				{ $$ = reduction("Exp",@1.first_line, 1, $1); $$->type = $$->exp_type=23;}
+	|	FLOAT				{ $$ = reduction("Exp",@1.first_line, 1, $1); $$->type = $$->exp_type=24;}
 	|	error RP
 	|	error RB
 	;
