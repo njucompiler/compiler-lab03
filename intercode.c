@@ -9,11 +9,77 @@ void InterCodes_init(){
 	InterCodes *temp = (InterCodes)malloc(sizeof(InterCodes));
 	temp->prev = NULL;
 	temp->next = NULL;
+	return temp;
 }
-
+void head_init(){
+	head = InterCodes_init();
+}
 void var_no_init(){
 	var_no = 1;
 }
+void printf_Operand(Operand p){
+	switch(p->kind){
+		case VARIABLE:
+			printf("%s",p->name);
+			break;
+		case CONSTANT:
+			printf("#%d",p->value);
+			break;
+		case ADDRESS:
+			printf("#%d",p->value);
+			break;
+		case TEMP:
+			printf("%s",p->name);
+			break;
+	}
+}
+void printf_ASSIGN(InterCodes *p){
+	printf_Operand(p->left);
+	printf(" := ");
+	printf_Operand(p->right);
+}
+void printf_ADD(InterCodes *p){
+	printf_Operand(p->result);
+	printf(" := ");
+	printf_Operand(p->op1);
+	printf(" + ");
+	printf_Operand(p->op2);
+}
+void printf_SUB(InterCodes *p){
+	printf_Operand(p->result);
+	printf(" := ");
+	printf_Operand(p->op1);
+	printf(" - ");
+	printf_Operand(p->op2);
+}
+void printf_MUL(InterCodes *p){
+	printf_Operand(p->result);
+	printf(" := ");
+	printf_Operand(p->op1);
+	printf(" * ");
+	printf_Operand(p->op2);
+}
+void show_all(InterCodes *p){
+	while(p!=NULL){
+		switch(p->code->kind){
+			case ASSIGN:
+				printf_ASSIGN(p);
+				break;
+			case ADD:
+				printf_ADD(p);
+				break;
+			case SUB:
+				printf_SUB(p);
+				break;
+			case MUL:
+				printf_MUL(p);
+				break;
+		}
+		p=p->next;
+		printf("\n");
+	}
+}
+
 
 InterCode* new_interCode(int kind){//init a new interCode
 	InterCode code = (InterCode)malloc(sizeof(InterCode_));
