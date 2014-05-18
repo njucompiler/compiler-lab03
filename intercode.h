@@ -1,5 +1,4 @@
 
-#define MAX_LINE 1000
 
 typedef struct Operand_* Operand;
 typedef struct InterCode_* InterCode;
@@ -18,9 +17,12 @@ struct InterCode_
 		struct { Operand right, left; } assign;
 		struct { Operand result, op1, op2; } binop;
 		} u;
-	InterCode next;
 };
-
+struct InterCodes 
+{
+	InterCode code; 
+	struct InterCodes *prev, *next; 
+};
 void var_no_init();
 InterCode new_interCode(int kind);
 Operand new_operand(int kind,int value);

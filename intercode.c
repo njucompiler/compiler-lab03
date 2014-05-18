@@ -4,6 +4,12 @@
 
 
 int var_no;
+InterCodes *head;
+void InterCodes_init(){
+	InterCodes *temp = (InterCodes)malloc(sizeof(InterCodes));
+	temp->prev = NULL;
+	temp->next = NULL;
+}
 
 void var_no_init(){
 	var_no = 1;
