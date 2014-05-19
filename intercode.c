@@ -1,6 +1,8 @@
 
 #include "intercode.h"
 #include "node.h"
+#include "string.h"
+#include "stdio.h"
 
 
 int var_no;
@@ -30,43 +32,50 @@ void var_no_init(){
 void printf_Operand(Operand p){
 	switch(p->kind){
 		case VARIABLE:
-			printf("%s",p->name);
+			fprintf(fp,"%s",p->name);
 			break;
 		case CONSTANT:
-			printf("#%d",p->value);
+			fprintf(fp,"#%d",p->value);
 			break;
 		case ADDRESS:
-			printf("#%d",p->value);
+			fprintf(fp,"#%d",p->value);
 			break;
 		case TEMP:
-			printf("%s",p->name);
+			fprintf(fp,"%s",p->name);
 			break;
 	}
 }
 void printf_ASSIGN(InterCodes *p){
 	printf_Operand(p->left);
-	printf(" := ");
+	fputs(" := ");
 	printf_Operand(p->right);
 }
 void printf_ADD(InterCodes *p){
 	printf_Operand(p->result);
-	printf(" := ");
+	fputs(" := ");
 	printf_Operand(p->op1);
-	printf(" + ");
+	fputs(" + ");
 	printf_Operand(p->op2);
 }
 void printf_SUB(InterCodes *p){
 	printf_Operand(p->result);
-	printf(" := ");
+	fputs(" := ");
 	printf_Operand(p->op1);
 	printf(" - ");
 	printf_Operand(p->op2);
 }
 void printf_MUL(InterCodes *p){
 	printf_Operand(p->result);
-	printf(" := ");
+	fputs(" := ");
 	printf_Operand(p->op1);
-	printf(" * ");
+	fputs(" * ");
+	printf_Operand(p->op2);
+}
+void printf_DIV(InterCodes *p){
+	printf_Operand(p->result);
+	fputs(" := ");
+	printf_Operand(p->op1);
+	fputs(" / ");
 	printf_Operand(p->op2);
 }
 void show_all(InterCodes *p){
@@ -83,6 +92,9 @@ void show_all(InterCodes *p){
 				break;
 			case MUL:
 				printf_MUL(p);
+				break;
+			case DIV:
+				printf_DIV(p);
 				break;
 		}
 		p=p->next;
