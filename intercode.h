@@ -5,19 +5,21 @@ typedef struct InterCode_* InterCode;
 typedef struct InterCodes_* InterCodes;
 
 struct Operand_ {
-	enum { VARIABLE, CONSTANT, ADDRESS, TEMP} kind;
+	enum { VARIABLE, CONSTANT, ADDRESS, TEMP,LABEL} kind;
 	union {
 	char name[20];
 	int var_no;
 	int value;
+	int label_no;
 	} u;
 };
 struct InterCode_
 {
-	enum { ASSIGN, ADD, SUB, MUL, DIV} kind;
+	enum { ASSIGN, ADD, SUB, MUL, DIV, LABEL, GOTO} kind;
 	union {
 		struct { Operand right, left; } assign;
 		struct { Operand result, op1, op2; } binop;
+		struct { Operand op; }onlyop;
 		} u;
 };
 
@@ -40,4 +42,6 @@ void printf_ADD(InterCodes *p);
 void printf_SUB(InterCodes *p);
 void printf_MUL(InterCodes *p);
 void printf_DIV(InterCodes *p);
+void printf_LABEL(InterCodes *p);
+void printf_GOTO(InterCodes *p);
 void show_all(InterCodes *p);

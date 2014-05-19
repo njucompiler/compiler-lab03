@@ -43,40 +43,53 @@ void printf_Operand(Operand p){
 		case TEMP:
 			fprintf(fp,"%s",p->name);
 			break;
+		case LABEL:
+			fprintf(fp,"label%d:",p->label_no);
+			break;
+		case GOTO:
+			fprintf(fp,"label%d",p->label_no);
 	}
 }
 void printf_ASSIGN(InterCodes *p){
-	printf_Operand(p->left);
-	fputs(" := ");
-	printf_Operand(p->right);
+	printf_Operand(p->assign.left);
+	fputs(" := ",fp);
+	printf_Operand(p->assign.right);
 }
 void printf_ADD(InterCodes *p){
-	printf_Operand(p->result);
-	fputs(" := ");
-	printf_Operand(p->op1);
-	fputs(" + ");
-	printf_Operand(p->op2);
+	printf_Operand(p->binop.result);
+	fputs(" := ",fp);
+	printf_Operand(p->binop.op1);
+	fputs(" + ",fp);
+	printf_Operand(p->binop.op2);
 }
 void printf_SUB(InterCodes *p){
-	printf_Operand(p->result);
-	fputs(" := ");
-	printf_Operand(p->op1);
-	printf(" - ");
-	printf_Operand(p->op2);
+	printf_Operand(p->binop.result);
+	fputs(" := ",fp);
+	printf_Operand(p->binop.op1);
+	printf(" - ",fp);
+	printf_Operand(p->binop.op2);
 }
 void printf_MUL(InterCodes *p){
-	printf_Operand(p->result);
-	fputs(" := ");
-	printf_Operand(p->op1);
-	fputs(" * ");
-	printf_Operand(p->op2);
+	printf_Operand(p->binop.result);
+	fputs(" := ",fp);
+	printf_Operand(p->binop.op1);
+	fputs(" * ",fp);
+	printf_Operand(p->binop.op2);
 }
 void printf_DIV(InterCodes *p){
-	printf_Operand(p->result);
-	fputs(" := ");
-	printf_Operand(p->op1);
-	fputs(" / ");
-	printf_Operand(p->op2);
+	printf_Operand(p->binop.result);
+	fputs(" := ",fp);
+	printf_Operand(p->binop.op1);
+	fputs(" / ",fp);
+	printf_Operand(p->binop.op2);
+}
+void printf_LABEL(InterCodes *p){
+	fputs("LABEL ",fp);
+	printf_Operand(p->onlyop.op)
+}
+void printf_GOTO(InterCodes *p){
+	fputs("GOTO ",fp);
+	printf_Operand(p->onlyop.op)
 }
 void show_all(InterCodes *p){
 	while(p!=NULL){
@@ -96,9 +109,15 @@ void show_all(InterCodes *p){
 			case DIV:
 				printf_DIV(p);
 				break;
+			case GOTO:
+				printf_GOTO(p);
+				break;
+			case LABEL:
+				printf_LAEBL(p);
+				break;
 		}
 		p=p->next;
-		printf("\n");
+		fputs("\n",fp);
 	}
 }
 
