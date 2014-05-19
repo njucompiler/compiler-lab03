@@ -343,3 +343,18 @@ Operand translate_Exp(node* exp,char* place){
 	}
 } 
 
+Operand translate_Stmt(node* Stmt){
+	if(strcmp(Stmt->child->node_value,"Exp") == 0){
+
+	}
+	else if(strcmp(Stmt->child->node_value,"CompSt") == 0){
+
+	}
+	else if(strcmp(Stmt->child->node_value,"RETURN") == 0){
+
+	}
+	else if(strcmp(Stmt->child->node_value,"WHILE") == 0){
+
+	}
+	else if(Stmt->child->brother-)
+} 
