@@ -15,7 +15,7 @@ struct Operand_ {
 };
 struct InterCode_
 {
-	enum { ASSIGN, ADD, SUB, MUL, DIV, LABEL, GOTO} kind;
+	enum { ASSIGN, ADD, SUB, MUL, DIV, LABEL, GOTO,RETURN} kind;
 	union {
 		struct { Operand right, left; } assign;
 		struct { Operand result, op1, op2; } binop;
