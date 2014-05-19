@@ -2,6 +2,8 @@
 
 typedef struct Operand_* Operand;
 typedef struct InterCode_* InterCode;
+typedef struct InterCodes_* InterCodes;
+
 struct Operand_ {
 	enum { VARIABLE, CONSTANT, ADDRESS, TEMP} kind;
 	union {
@@ -12,16 +14,17 @@ struct Operand_ {
 };
 struct InterCode_
 {
-	enum { ASSIGN, ADD, SUB, MUL} kind;
+	enum { ASSIGN, ADD, SUB, MUL, DIV} kind;
 	union {
 		struct { Operand right, left; } assign;
 		struct { Operand result, op1, op2; } binop;
 		} u;
 };
-struct InterCodes 
+
+struct InterCodes_
 {
 	InterCode code; 
-	struct InterCodes *prev, *next; 
+	InterCodes prev, next; 
 };
 void var_no_init();
 InterCode new_interCode(int kind);

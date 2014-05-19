@@ -4,13 +4,23 @@
 
 
 int var_no;
-InterCodes *head;
+InterCodes head;
 void InterCodes_init(){
-	InterCodes *temp = (InterCodes)malloc(sizeof(InterCodes));
+	InterCodes temp = (InterCodes)malloc(sizeof(InterCodes_));
 	temp->prev = NULL;
 	temp->next = NULL;
 	return temp;
 }
+
+void InterCodes_link(InterCodes prev,InterCodes next){
+	InterCodes temp = prev;
+	while(temp->next != NULL){
+		temp = temp->next;
+	}
+	temp->next = next;
+	next->prev = prev;
+}
+
 void head_init(){
 	head = InterCodes_init();
 }
@@ -115,25 +125,31 @@ char* new_temp(){
 	char num[4];
 	sprintf(str,"%d",var_no);
 	strcat(temp,num);
+	var_no++;
 	return temp;
 }
 
 Operand translate_Exp(node* exp,char* place){
 	//-------------------------------------------------Exp ASSIGNOP Exp
 	if(exp->exp_type == 7){
-		char t = new_temp();		
 		t_no = var_no;
-		var_no++;
-		InterCode code1 = translate_Exp(exp->child->brother->brother,t);
-		InterCode code2 = new_interCode(0);
-		code2.assign.left = new_operand_name(exp->child->node_value);
-		code2.assign.right = new_operand(0,t_no);
+		char t = new_temp();		
+		InterCodes codes1 = InterCodes_init();
+		InterCodes codes2 = InterCodes_init();
+		codes1 = translate_Exp(exp->child->brother->brother,t);
+		codes2.code = new_interCode(0);
+		codes2.code.assign.left = new_operand_name(exp->child->node_value);
+		codes2.code.assign.right = new_operand(0,t_no);
 
-		InterCode code3 = new_interCode(0);
-		code3.assign.left = new_operand(3,t_no);
-		code3.assign.right = new_operand_name(exp->child->node_value);
-		code1.next = code2;
-		code2->next = code3;
+		InterCodes codes3 = InterCodes_init();
+		codes3.code = new_interCode(0);
+		codes3.code.assign.left = new_operand(3,t_no);
+		codes3.code.assign.right = new_operand_name(exp->child->node_value);
+
+		InterCodes_link(codes1,codes2);
+		codes2.next = codes3;
+		codes3.prev = codes2;
+		return codes1;
 	}
 	//-------------------------------------------------Exp AND Exp
 	else if(exp->exp_type == 8){
@@ -152,22 +168,106 @@ Operand translate_Exp(node* exp,char* place){
 
 	//-------------------------------------------------Exp PLUS Exp
 	else if(exp->exp_type == 11){
-		
+		int t1_no = var_no;
+		int t2_no = t1_no+1;
+		char* t1 = new_temp();
+		char* t2 = new_temp();
+
+		InterCodes codes1 = InterCodes_init();
+		InterCodes codes2 = InterCodes_init();
+		InterCodes codes3 = InterCodes_init();
+		codes1 = translate_Exp(exp->child->brother->brother,t1);
+		codes2 = translate_Exp(exp->child,t2);
+		codes3.code = new_interCode(1);//plus
+		if(place[0] == 't');
+			codes3.code.binop.result = new_operand(3,t1_no-1);
+		else
+			codes3.code.binop.result = new_operand_name(place);
+		codes3.code.binop.op1 = new_operand(3,t1_no);
+		codes3.code.binop.op2 = new_operand(3,t2_no);
+
+		InterCodes_link(codes1,codes2);
+		InterCodes_link(codes2,codes3);
+
+		return codes1;
 	}
 
 	//-------------------------------------------------Exp MINUS Exp
 	else if(exp->exp_type == 12){
-		
+		int t1_no = var_no;
+		int t2_no = t1_no+1;
+		char* t1 = new_temp();
+		char* t2 = new_temp();
+
+		InterCodes codes1 = InterCodes_init();
+		InterCodes codes2 = InterCodes_init();
+		InterCodes codes3 = InterCodes_init();
+		codes1 = translate_Exp(exp->child->brother->brother,t1);
+		codes2 = translate_Exp(exp->child,t2);
+		codes3.code = new_interCode(2);//sub
+		if(place[0] == 't');
+			codes3.code.binop.result = new_operand(3,t1_no-1);
+		else
+			codes3.code.binop.result = new_operand_name(place);
+		codes3.code.binop.op1 = new_operand(3,t1_no);
+		codes3.code.binop.op2 = new_operand(3,t2_no);
+
+		InterCodes_link(codes1,codes2);
+		InterCodes_link(codes2,codes3);
+
+		return codes1;
 	}
 
 	//--------------------------------------------------Exp STAR Exp
 	else if(exp->exp_type == 13){
-		
+		int t1_no = var_no;
+		int t2_no = t1_no+1;
+		char* t1 = new_temp();
+		char* t2 = new_temp();
+
+		InterCodes codes1 = InterCodes_init();
+		InterCodes codes2 = InterCodes_init();
+		InterCodes codes3 = InterCodes_init();
+		codes1 = translate_Exp(exp->child->brother->brother,t1);
+		codes2 = translate_Exp(exp->child,t2);
+		codes3.code = new_interCode(3);//plus
+		if(place[0] == 't');
+			codes3.code.binop.result = new_operand(3,t1_no-1);
+		else
+			codes3.code.binop.result = new_operand_name(place);
+		codes3.code.binop.op1 = new_operand(3,t1_no);
+		codes3.code.binop.op2 = new_operand(3,t2_no);
+
+		InterCodes_link(codes1,codes2);
+		InterCodes_link(codes2,codes3);
+
+		return codes1;
 	}
 
 	//--------------------------------------------------Exp DIV Exp
 	else if(exp->exp_type == 14){	
-		
+		int t1_no = var_no;
+		int t2_no = t1_no+1;
+		char* t1 = new_temp();
+		char* t2 = new_temp();
+
+		InterCodes codes1 = InterCodes_init();
+		InterCodes codes2 = InterCodes_init();
+		InterCodes codes3 = InterCodes_init();
+		codes1 = translate_Exp(exp->child->brother->brother,t1);
+		codes2 = translate_Exp(exp->child,t2);
+		codes3.code = new_interCode(4);//div
+		if(place[0] == 't');
+			codes3.code.binop.result = new_operand(3,t1_no-1);
+		else
+			codes3.code.binop.result = new_operand_name(place);
+		codes3.code.binop.op1 = new_operand(3,t1_no);
+		codes3.code.binop.op2 = new_operand(3,t2_no);
+
+		InterCodes_link(codes1,codes2);
+		InterCodes_link(codes2,codes3);
+
+		return codes1;
 	}
 
 	//--------------------------------------------------LP Exp RP
@@ -177,7 +277,20 @@ Operand translate_Exp(node* exp,char* place){
 
 	//--------------------------------------------------MINUS Exp
 	else if(exp->exp_type == 16){
-		
+		int t1_no = var_no;
+		char* t1 = new_temp();
+		InterCodes codes1 = InterCodes_init();
+		InterCodes codes2 = InterCodes_init();
+		codes1 = translate_Exp(exp->child->brother,t1);
+		codes2.code = new_interCode(0);
+		if(place[0] == 't')
+			codes2.code.assign.left = new_operand(3,t1_no-1);
+		else
+			codes2.code.assign.left = new_operand_name(place);
+		codes2.code.assign.right = new_operand(3,-t1_no);
+
+		InterCodes_link(codes1,codes2);
+		return codes1;
 	}
 
 	//---------------------------------------------------NOT Exp
@@ -216,11 +329,12 @@ Operand translate_Exp(node* exp,char* place){
 
 	//--------------------------------------------------INT
 	else if(exp->exp_type == 23){
-		InterCode code = new_interCode(0);
-		code.assign.right = new_operand(1,exp->node_int);
-		code.assign.left = new_operand(3,var_no);
+		InterCodes codes = InterCodes_init();
+		codes.code = new_interCode(0);
+		codes.code.assign.right = new_operand(1,exp->node_int);
+		codes.code.assign.left = new_operand(3,var_no);
 		var_no++;
-		return code;
+		return codes;
 	}
 
 	//--------------------------------------------------FLOAT
