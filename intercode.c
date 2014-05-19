@@ -48,6 +48,8 @@ void printf_Operand(Operand p){
 			break;
 		case GOTO:
 			fprintf(fp,"label%d",p->label_no);
+		case RETURN:
+			fprintf(fp,"%s",p->name);
 	}
 }
 void printf_ASSIGN(InterCodes *p){
@@ -85,11 +87,15 @@ void printf_DIV(InterCodes *p){
 }
 void printf_LABEL(InterCodes *p){
 	fputs("LABEL ",fp);
-	printf_Operand(p->onlyop.op)
+	printf_Operand(p->onlyop.op);
 }
 void printf_GOTO(InterCodes *p){
 	fputs("GOTO ",fp);
-	printf_Operand(p->onlyop.op)
+	printf_Operand(p->onlyop.op);
+}
+void printf_RETURN(InterCodes *p){
+	printf("RETURN ",fp);
+	printf_Operand(p->onlyop.op);
 }
 void show_all(InterCodes *p){
 	while(p!=NULL){
@@ -115,6 +121,10 @@ void show_all(InterCodes *p){
 			case LABEL:
 				printf_LAEBL(p);
 				break;
+			case RETURN:
+				printf_RETURN(p);
+				break;
+			
 		}
 		p=p->next;
 		fputs("\n",fp);

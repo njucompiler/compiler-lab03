@@ -44,4 +44,5 @@ void printf_MUL(InterCodes *p);
 void printf_DIV(InterCodes *p);
 void printf_LABEL(InterCodes *p);
 void printf_GOTO(InterCodes *p);
+void printf_RETURN(InterCodes *p);
 void show_all(InterCodes *p);
