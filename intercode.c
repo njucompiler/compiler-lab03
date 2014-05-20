@@ -153,6 +153,7 @@ InterCode new_interCode(int kind){//init a new interCode
 Operand new_operand(int kind,int value){//init a new operand
 	Operand op = (Operand)malloc(sizeof(Operand_));
 	op.kind = kind;
+	op.is_min = 0;
 	if(kind == 1)//constant
 		op.value = value;
 	else
@@ -163,34 +164,34 @@ Operand new_operand(int kind,int value){//init a new operand
 Operand new_operand_name(char* name){
 	Operand op = (Operand)malloc(sizeof(Operand_));
 	op.kind = 0;//var
+	op.is_min = 0;
 	strcpy(op.name,name);
 	return op;
 }
 
-char* new_temp(){
-	char temp[8] = "t";
-	char num[4];
-	sprintf(str,"%d",var_no);
-	strcat(temp,num);
+Operand new_temp(){
+	Operand op = (Operand)malloc(sizeof(Operand_));
+	op.kind = 3;
+	is_min = 0;
+	op.var_no = var_no;
 	var_no++;
-	return temp;
+	return op;
 }
 
-Operand translate_Exp(node* exp,char* place){
+InterCodes translate_Exp(node* exp,Operand place){
 	//-------------------------------------------------Exp ASSIGNOP Exp
 	if(exp->exp_type == 7){
-		t_no = var_no;
-		char t = new_temp();		
+		Operand t = new_temp();		
 		InterCodes codes1 = InterCodes_init();
 		InterCodes codes2 = InterCodes_init();
 		codes1 = translate_Exp(exp->child->brother->brother,t);
 		codes2.code = new_interCode(0);
 		codes2.code.assign.left = new_operand_name(exp->child->node_value);
-		codes2.code.assign.right = new_operand(0,t_no);
+		codes2.code.assign.right = t;
 
 		InterCodes codes3 = InterCodes_init();
 		codes3.code = new_interCode(0);
-		codes3.code.assign.left = new_operand(3,t_no);
+		codes3.code.assign.left = place;
 		codes3.code.assign.right = new_operand_name(exp->child->node_value);
 
 		InterCodes_link(codes1,codes2);
@@ -215,10 +216,8 @@ Operand translate_Exp(node* exp,char* place){
 
 	//-------------------------------------------------Exp PLUS Exp
 	else if(exp->exp_type == 11){
-		int t1_no = var_no;
-		int t2_no = t1_no+1;
-		char* t1 = new_temp();
-		char* t2 = new_temp();
+		Operand t1 = new_temp();
+		Operand t2 = new_temp();
 
 		InterCodes codes1 = InterCodes_init();
 		InterCodes codes2 = InterCodes_init();
@@ -226,12 +225,9 @@ Operand translate_Exp(node* exp,char* place){
 		codes1 = translate_Exp(exp->child->brother->brother,t1);
 		codes2 = translate_Exp(exp->child,t2);
 		codes3.code = new_interCode(1);//plus
-		if(place[0] == 't');
-			codes3.code.binop.result = new_operand(3,t1_no-1);
-		else
-			codes3.code.binop.result = new_operand_name(place);
-		codes3.code.binop.op1 = new_operand(3,t1_no);
-		codes3.code.binop.op2 = new_operand(3,t2_no);
+		codes3.code.binop.result = place;
+		codes3.code.binop.op1 = t1;
+		codes3.code.binop.op2 = t2;
 
 		InterCodes_link(codes1,codes2);
 		InterCodes_link(codes2,codes3);
@@ -241,10 +237,8 @@ Operand translate_Exp(node* exp,char* place){
 
 	//-------------------------------------------------Exp MINUS Exp
 	else if(exp->exp_type == 12){
-		int t1_no = var_no;
-		int t2_no = t1_no+1;
-		char* t1 = new_temp();
-		char* t2 = new_temp();
+		Operand t1 = new_temp();
+		Operand t2 = new_temp();
 
 		InterCodes codes1 = InterCodes_init();
 		InterCodes codes2 = InterCodes_init();
@@ -252,12 +246,9 @@ Operand translate_Exp(node* exp,char* place){
 		codes1 = translate_Exp(exp->child->brother->brother,t1);
 		codes2 = translate_Exp(exp->child,t2);
 		codes3.code = new_interCode(2);//sub
-		if(place[0] == 't');
-			codes3.code.binop.result = new_operand(3,t1_no-1);
-		else
-			codes3.code.binop.result = new_operand_name(place);
-		codes3.code.binop.op1 = new_operand(3,t1_no);
-		codes3.code.binop.op2 = new_operand(3,t2_no);
+		codes3.code.binop.result = place;
+		codes3.code.binop.op1 = t1;
+		codes3.code.binop.op2 = t2;
 
 		InterCodes_link(codes1,codes2);
 		InterCodes_link(codes2,codes3);
@@ -267,23 +258,18 @@ Operand translate_Exp(node* exp,char* place){
 
 	//--------------------------------------------------Exp STAR Exp
 	else if(exp->exp_type == 13){
-		int t1_no = var_no;
-		int t2_no = t1_no+1;
-		char* t1 = new_temp();
-		char* t2 = new_temp();
+		Operand t1 = new_temp();
+		Operand t2 = new_temp();
 
 		InterCodes codes1 = InterCodes_init();
 		InterCodes codes2 = InterCodes_init();
 		InterCodes codes3 = InterCodes_init();
 		codes1 = translate_Exp(exp->child->brother->brother,t1);
 		codes2 = translate_Exp(exp->child,t2);
-		codes3.code = new_interCode(3);//plus
-		if(place[0] == 't');
-			codes3.code.binop.result = new_operand(3,t1_no-1);
-		else
-			codes3.code.binop.result = new_operand_name(place);
-		codes3.code.binop.op1 = new_operand(3,t1_no);
-		codes3.code.binop.op2 = new_operand(3,t2_no);
+		codes3.code = new_interCode(3);//star
+		codes3.code.binop.result = place;
+		codes3.code.binop.op1 = t1;
+		codes3.code.binop.op2 = t2;
 
 		InterCodes_link(codes1,codes2);
 		InterCodes_link(codes2,codes3);
@@ -293,10 +279,8 @@ Operand translate_Exp(node* exp,char* place){
 
 	//--------------------------------------------------Exp DIV Exp
 	else if(exp->exp_type == 14){	
-		int t1_no = var_no;
-		int t2_no = t1_no+1;
-		char* t1 = new_temp();
-		char* t2 = new_temp();
+		Operand t1 = new_temp();
+		Operand t2 = new_temp();
 
 		InterCodes codes1 = InterCodes_init();
 		InterCodes codes2 = InterCodes_init();
@@ -304,12 +288,9 @@ Operand translate_Exp(node* exp,char* place){
 		codes1 = translate_Exp(exp->child->brother->brother,t1);
 		codes2 = translate_Exp(exp->child,t2);
 		codes3.code = new_interCode(4);//div
-		if(place[0] == 't');
-			codes3.code.binop.result = new_operand(3,t1_no-1);
-		else
-			codes3.code.binop.result = new_operand_name(place);
-		codes3.code.binop.op1 = new_operand(3,t1_no);
-		codes3.code.binop.op2 = new_operand(3,t2_no);
+		codes3.code.binop.result = place;
+		codes3.code.binop.op1 = t1;
+		codes3.code.binop.op2 = t2;
 
 		InterCodes_link(codes1,codes2);
 		InterCodes_link(codes2,codes3);
@@ -324,17 +305,14 @@ Operand translate_Exp(node* exp,char* place){
 
 	//--------------------------------------------------MINUS Exp
 	else if(exp->exp_type == 16){
-		int t1_no = var_no;
-		char* t1 = new_temp();
+		Operand t1 = new_temp();
 		InterCodes codes1 = InterCodes_init();
 		InterCodes codes2 = InterCodes_init();
 		codes1 = translate_Exp(exp->child->brother,t1);
 		codes2.code = new_interCode(0);
-		if(place[0] == 't')
-			codes2.code.assign.left = new_operand(3,t1_no-1);
-		else
-			codes2.code.assign.left = new_operand_name(place);
-		codes2.code.assign.right = new_operand(3,-t1_no);
+		codes2.code.assign.left = place;
+		t1.is_min = 1;
+		codes2.code.assign.right = t1;
 
 		InterCodes_link(codes1,codes2);
 		return codes1;
@@ -379,8 +357,7 @@ Operand translate_Exp(node* exp,char* place){
 		InterCodes codes = InterCodes_init();
 		codes.code = new_interCode(0);
 		codes.code.assign.right = new_operand(1,exp->node_int);
-		codes.code.assign.left = new_operand(3,var_no);
-		var_no++;
+		codes.code.assign.left = new_operand(3,var_no-1);
 		return codes;
 	}
 
@@ -390,12 +367,55 @@ Operand translate_Exp(node* exp,char* place){
 	}
 } 
 
-Operand translate_Stmt(node* Stmt){
-	if(strcmp(Stmt->child->node_value,"Exp") == 0){
+InterCodes translate_Declist(node* declist){
+	if(declist->child->brother == NULL){
+		return translate_Dec(declist->child);
+	}
+	else{
+		InterCodes codes1 = InterCodes_init();
+		InterCodes codes2 = InterCodes_init();
+		codes1 = translate_Dec(child);
+		codes2 = translate_Declist(child->next_sibling->next_sibling);
+		codes1 = link_ir(code1, code2);
+		return codes1;
+	}
+}
 
+InterCodes translate_Def(node* deflist){
+	if(deflist->child != NULL)
+		return translate_Declist(deflist->child->brother);
+	else
+		return NULL;
+}
+
+InterCodes translate_Deflist(node* deflist){
+	if(deflist != NULL){
+		InterCodes codes1 = InterCodes_init();
+		InterCodes codes2 = InterCodes_init();
+		codes1 = translate_Def(deflist->child);
+		codes2 = translate_Deflist(deflist->child->brother);
+		InterCodes_link(codes1,codes2);
+	return codes1;
+	}
+	else
+		return NULL;
+}
+
+InterCodes translate_Compst(node* CompSt){
+	InterCodes codes1 = InterCodes_init();
+	InterCodes codes2 = InterCodes_init();
+	codes1 = translate_Deflist(CompSt->child->brother);
+	codes2 = translate_Stmtlist(CompSt->child->brother->brother);
+	InterCodes_link(codes1, codes2);
+	return codes1;
+}
+
+InterCodes translate_Stmt(node* Stmt){
+	if(strcmp(Stmt->child->node_value,"Exp") == 0){
+		return translate_Exp(Stmt->child,NULL);
 	}
 	else if(strcmp(Stmt->child->node_value,"CompSt") == 0){
-
+		return translate_Compst(child);
 	}
 	else if(strcmp(Stmt->child->node_value,"RETURN") == 0){
 
@@ -405,6 +425,20 @@ Operand translate_Stmt(node* Stmt){
 	}
 	else if(Stmt->child->brother-)
 } 
+
+InterCodes translate_Stmtlist(node* Stmtlist){
+	if(Stmtlist != NULL){
+		InterCodes codes1 = InterCodes_init();
+		InterCodes codes2 = InterCodes_init();
+		codes1 = translate_Stmt(Stmtlist->child);
+		codes2 = translate_Stmtlist(Stmtlist->child->brother);
+		InterCodes_link(codes1,codes2);
+		return codes1;
+	}
+	else
+		return NULL;
+}
+
 
 void intercode_aly(node *p){		
 	char name[20];

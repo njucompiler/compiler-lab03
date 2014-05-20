@@ -1,3 +1,5 @@
+#ifdef _INTERCODE_
+#define _INTERCODE_
 
 #include "node.h"
 #include "string.h"
@@ -8,6 +10,7 @@ typedef struct InterCodes_* InterCodes;
 
 struct Operand_ {
 	enum { VARIABLE, CONSTANT, ADDRESS, TEMP,LABEL} kind;
+	int is_min;
 	union {
 	char name[20];
 	int var_no;
@@ -52,3 +55,5 @@ void printf_LABEL(InterCodes p);
 void printf_GOTO(InterCodes p);
 void printf_RETURN(InterCodes p);
 void show_all(char* output);
+
+#endif

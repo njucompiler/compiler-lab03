@@ -1,3 +1,6 @@
+#ifdef _TYPE_H_
+#define _TYPE_H_
+
 typedef struct Type_* Type;
 typedef struct FieldList_* FieldList;
 
@@ -39,3 +42,5 @@ struct FieldList_
 	FieldList brother;	
 	FieldList scope;	//链接同一层作用域的指针
 };
+
+#endif
