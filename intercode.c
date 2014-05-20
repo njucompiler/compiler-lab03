@@ -367,16 +367,57 @@ InterCodes translate_Exp(node* exp,Operand place){
 	}
 } 
 
+InterCodes translate_Cond(node* exp,Operand true_place,Operand false_place){
+	if(strcmp(exp->child->name,"NOT")==0){
+		
+	}
+	else if(strcmp(exp->child->brother->name,"RELOP")==0){
+		Operand t1 = new_temp();
+		Operand t2 = new_temp();
+		InterCodes codes1 = translate_Exp(exp->child,t1);
+		InterCodes codes2 = translate_Exp(exp->child->brother->brother,t2);
+		
+	}
+	else if(strcmp(exp->child->brother->name,"AND")==0){
+
+	}
+	else if(strcmp(exp->child->brother->name,"OR")==0){
+
+	}
+}
+
+InterCodes translate_Dec(node* dec){
+	/*
+	*	Dec
+	*	|	VarDec 
+	*	|	VarDec ASSIGNOP Exp
+	*/	
+
+	if(dec->child->brother != NULL){
+		Operand t1 = new_temp();
+		InterCodes codes1 = translate_Exp(dec->child->brother->brother, t1);
+		//Operand t1 = new_temp();
+		//InterCodes codes1 = translate_Vardec(child, t1);
+		codes3.code = new_interCode(0);
+		codes3.code.left = new_operand_name(dec->child->node_value);
+		codes3.code.right = t1;
+		InterCodes_link(codes1,codes3);
+		//InterCodes_link(codes2,codes3);
+		return codes1;
+	}
+	return NULL;
+}
+
 InterCodes translate_Declist(node* declist){
+	InterCodes codes1 = InterCodes_init();
+	codes1 = translate_Dec(declist->child);
 	if(declist->child->brother == NULL){
-		return translate_Dec(declist->child);
+		return codes1;
 	}
 	else{
-		InterCodes codes1 = InterCodes_init();
 		InterCodes codes2 = InterCodes_init();
-		codes1 = translate_Dec(child);
-		codes2 = translate_Declist(child->next_sibling->next_sibling);
-		codes1 = link_ir(code1, code2);
+		codes2 = translate_Declist(declist->child->brother->brother);
+		InterCodes_link(codes1, codes2);
 		return codes1;
 	}
 }
