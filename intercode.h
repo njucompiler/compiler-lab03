@@ -1,14 +1,16 @@
-#ifdef _INTERCODE_
-#define _INTERCODE_
+#ifndef _INTERCODE_H_
+#define _INTERCODE_H_
 
+#include <stdarg.h>
+#include <string.h>
+#include <stdio.h>
 #include "node.h"
-#include "string.h"
-#include "stdio.h"
+
 typedef struct Operand_* Operand;
 typedef struct InterCode_* InterCode;
 typedef struct InterCodes_* InterCodes;
 
-struct Operand_ {
+typedef struct Operand_ {
 	enum { VARIABLE, CONSTANT, ADDRESS, TEMP,LABEL} kind;
 	int is_min;
 	union {
@@ -16,23 +18,23 @@ struct Operand_ {
 	int var_no;
 	int value;
 	int label_no;
-	} u;
-};
-struct InterCode_
+	} ;
+}Operand_;
+typedef struct InterCode_
 {
 	enum { ASSIGN, ADD, SUB, MUL, DIVI, LAB, GOTO, RET} kind;
 	union {
 		struct { Operand right, left; } assign;
 		struct { Operand result, op1, op2; } binop;
 		struct { Operand op; }onlyop;
-		} u;
-};
+		};
+}InterCode_;
 
-struct InterCodes_
+typedef struct InterCodes_
 {
 	InterCode code; 
 	InterCodes prev, next; 
-};
+}InterCodes_;
 
 InterCodes intercodes_head;
 
@@ -40,8 +42,9 @@ void var_no_init();
 InterCode new_interCode(int kind);
 Operand new_operand(int kind,int value);
 Operand new_operand_name(char* name);
-Operand translate_Exp(node* exp,char* place);
-void InterCodes_init();
+InterCodes translate_Exp(node* exp,Operand place);
+InterCodes translate_Stmtlist(node* Stmtlist);
+InterCodes InterCodes_init();
 void InterCodes_link(InterCodes prev,InterCodes next);
 void head_init();
 void intercode_aly(node* p);

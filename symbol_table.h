@@ -1,4 +1,4 @@
-#ifdef _SYMBOLTABLE_H_
+#ifndef _SYMBOLTABLE_H_
 #define _SYMBOLTABLE_H_
 
 #include "type.h"
