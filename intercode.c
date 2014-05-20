@@ -1,12 +1,10 @@
 
 #include "intercode.h"
-#include "node.h"
-#include "string.h"
-#include "stdio.h"
 
+FILE* fp;
+extern char* output;
 
 int var_no;
-InterCodes head;
 void InterCodes_init(){
 	InterCodes temp = (InterCodes)malloc(sizeof(InterCodes_));
 	temp->prev = NULL;
@@ -24,7 +22,7 @@ void InterCodes_link(InterCodes prev,InterCodes next){
 }
 
 void head_init(){
-	head = InterCodes_init();
+	intercodes_head = InterCodes_init();
 }
 void var_no_init(){
 	var_no = 1;
@@ -43,61 +41,68 @@ void printf_Operand(Operand p){
 		case TEMP:
 			fprintf(fp,"%s",p->name);
 			break;
-		case LABEL:
+		case LAB:
 			fprintf(fp,"label%d:",p->label_no);
 			break;
 		case GOTO:
 			fprintf(fp,"label%d",p->label_no);
-		case RETURN:
+		case RET:
 			fprintf(fp,"%s",p->name);
 	}
 }
-void printf_ASSIGN(InterCodes *p){
+void printf_ASSIGN(InterCodes p){
 	printf_Operand(p->assign.left);
 	fputs(" := ",fp);
 	printf_Operand(p->assign.right);
 }
-void printf_ADD(InterCodes *p){
+void printf_ADD(InterCodes p){
 	printf_Operand(p->binop.result);
 	fputs(" := ",fp);
 	printf_Operand(p->binop.op1);
 	fputs(" + ",fp);
 	printf_Operand(p->binop.op2);
 }
-void printf_SUB(InterCodes *p){
+void printf_SUB(InterCodes p){
 	printf_Operand(p->binop.result);
 	fputs(" := ",fp);
 	printf_Operand(p->binop.op1);
 	printf(" - ",fp);
 	printf_Operand(p->binop.op2);
 }
-void printf_MUL(InterCodes *p){
+void printf_MUL(InterCodes p){
 	printf_Operand(p->binop.result);
 	fputs(" := ",fp);
 	printf_Operand(p->binop.op1);
 	fputs(" * ",fp);
 	printf_Operand(p->binop.op2);
 }
-void printf_DIV(InterCodes *p){
+void printf_DIV(InterCodes p){
 	printf_Operand(p->binop.result);
 	fputs(" := ",fp);
 	printf_Operand(p->binop.op1);
 	fputs(" / ",fp);
 	printf_Operand(p->binop.op2);
 }
-void printf_LABEL(InterCodes *p){
+void printf_LABEL(InterCodes p){
 	fputs("LABEL ",fp);
 	printf_Operand(p->onlyop.op);
 }
-void printf_GOTO(InterCodes *p){
+void printf_GOTO(InterCodes p){
 	fputs("GOTO ",fp);
 	printf_Operand(p->onlyop.op);
 }
-void printf_RETURN(InterCodes *p){
+void printf_RETURN(InterCodes p){
 	printf("RETURN ",fp);
 	printf_Operand(p->onlyop.op);
 }
-void show_all(InterCodes *p){
+void show_all(char* output){
+	fp = fopen(output,"w");
+	if ( !fp )
+	{
+		perror(output);
+		return 1;
+	}
+	InterCodes p = intercodes_head;
 	while(p!=NULL){
 		switch(p->code->kind){
 			case ASSIGN:
@@ -129,10 +134,11 @@ void show_all(InterCodes *p){
 		p=p->next;
 		fputs("\n",fp);
 	}
+	fclose(fp);
 }
 
 
-InterCode* new_interCode(int kind){//init a new interCode
+InterCode new_interCode(int kind){//init a new interCode
 	InterCode code = (InterCode)malloc(sizeof(InterCode_));
 	code.kind = kind;
 	if(kind == 0){//assignop
@@ -399,3 +405,34 @@ Operand translate_Stmt(node* Stmt){
 	}
 	else if(Stmt->child->brother-)
 } 
+
+void intercode_aly(node *p){		
+	char name[20];
+	strcpy(name,p->name);
+	if(strcmp(name,"Def")==0)
+
+	else if(strcmp(name,"ExtDef")==0){
+
+	}
+	else if(strcmp(name,"Exp")==0){
+		char* t1 = new_temp();
+		translate_Exp(p,t1);
+		if(p->brother != NULL)
+			intercode_aly(p->brother);
+		return;
+	}
+	else if(strcmp(name,"CompSt")==0){
+
+	}
+	else if(strcmp(name,"Args")==0){
+
+	}
+	else if(strcmp(name,"Stmt")==0){
+
+	}
+	if(p->child != NULL)
+		intercode_aly(p->child);
+	if(p->brother != NULL)
+		intercode_aly(p->brother);
+	return;
+}

@@ -1,5 +1,7 @@
 
-
+#include "node.h"
+#include "string.h"
+#include "stdio.h"
 typedef struct Operand_* Operand;
 typedef struct InterCode_* InterCode;
 typedef struct InterCodes_* InterCodes;
@@ -15,7 +17,7 @@ struct Operand_ {
 };
 struct InterCode_
 {
-	enum { ASSIGN, ADD, SUB, MUL, DIV, LABEL, GOTO,RETURN} kind;
+	enum { ASSIGN, ADD, SUB, MUL, DIVI, LAB, GOTO, RET} kind;
 	union {
 		struct { Operand right, left; } assign;
 		struct { Operand result, op1, op2; } binop;
@@ -28,6 +30,9 @@ struct InterCodes_
 	InterCode code; 
 	InterCodes prev, next; 
 };
+
+InterCodes intercodes_head;
+
 void var_no_init();
 InterCode new_interCode(int kind);
 Operand new_operand(int kind,int value);
@@ -36,13 +41,14 @@ Operand translate_Exp(node* exp,char* place);
 void InterCodes_init();
 void InterCodes_link(InterCodes prev,InterCodes next);
 void head_init();
+void intercode_aly(node* p);
 void printf_Operand(Operand p);
-void printf_ASSIGN(InterCodes *p);
-void printf_ADD(InterCodes *p);
-void printf_SUB(InterCodes *p);
-void printf_MUL(InterCodes *p);
-void printf_DIV(InterCodes *p);
-void printf_LABEL(InterCodes *p);
-void printf_GOTO(InterCodes *p);
-void printf_RETURN(InterCodes *p);
-void show_all(InterCodes *p);
+void printf_ASSIGN(InterCodes p);
+void printf_ADD(InterCodes p);
+void printf_SUB(InterCodes p);
+void printf_MUL(InterCodes p);
+void printf_DIV(InterCodes p);
+void printf_LABEL(InterCodes p);
+void printf_GOTO(InterCodes p);
+void printf_RETURN(InterCodes p);
+void show_all(char* output);
