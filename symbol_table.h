@@ -728,5 +728,59 @@ void ARRAY_Insert(node *VarDec,char *name,char *spec){
 		}
 	}
 }
+void add_read(){
+	char name[20] = "read";
+	int i = hash_pjw(name);
+	if(SymbolTable[i] == NULL){
+		SymbolTable[i] = FieldList_init();
+		strcpy(SymbolTable[i]->name,name);
+		SymbolTable[i]->type->kind = FUNC;
+		strcpy(SymbolTable[i]->type->func.RETURN,"INT");
+		SymbolTable[i]->type->func.declare = 1;
+		SymbolTable[i]->type.func.brohter = NULL;
+		SymbolTable[i]->child = NULL;
+		SymbolTable[i]->brother = NULL;
+	}
+	else{
+		FieldList p = FieldList_init();
+		p->child = SymbolTable[i]->child;
+		SymbolTable[i] = p;
+		strcpy(p->name,name);
+		strcpy(SymbolTable[i]->type->func.RETURN,"INT");
+		p->type->kind = FUNC;
+		p->type->func.brother = NULL;		
+	}
+}
+void add_write(){
+	char name[20] = "write";
+	int i = hash_pjw(name);
+	if(SymbolTable[i] == NULL){
+		SymbolTable[i] = FieldList_init();
+		strcpy(SymbolTable[i]->name,name);
+		SymbolTable[i]->type->kind = FUNC;
+		strcpy(SymbolTable[i]->type->func.RETURN,"INT");
+		SymbolTable[i]->type->func.declare = 1;
+		SymbolTable[i]->type.func.brohter = NULL;
+		SymbolTable[i]->child = NULL;
+		SymbolTable[i]->brother = NULL;
+		FuncVar *temp = (FuncVar*)malloc(sizeof(FuncVar));
+		temp->next =NULL;
+		SymbolTable[i]->type->func.brother = temp;
+		strcpy(temp->kind,"INT");
+	}
+	else{
+		FieldList p = FieldList_init();
+		p->child = SymbolTable[i]->child;
+		SymbolTable[i] = p;
+		strcpy(p->name,name);
+		strcpy(SymbolTable[i]->type->func.RETURN,"INT");
+		p->type->kind = FUNC;
+		p->type->func.brother = NULL;
+		FuncVar *temp = (FuncVar*)malloc(sizeof(FuncVar));
+		temp->next =NULL;
+		p->type->func.brother = temp;
+		strcpy(temp->kind,"INT");	
+	}
+}
 
 #endif

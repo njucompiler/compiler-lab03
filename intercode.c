@@ -9,6 +9,7 @@
 FILE* fp;
 
 int var_no;
+int label_num = 0;
 InterCodes InterCodes_init(){
 	InterCodes temp = (InterCodes)malloc(sizeof(InterCodes_));
 	temp->prev = NULL;
@@ -125,13 +126,14 @@ void show_all(char* output){
 	}
 	printf("%s\n",output);
 	InterCodes p = intercodes_head->next;
+	printf("%s\n",output);
 	while(p!=NULL){
 		switch(p->code->kind){
 			case ASSIGN:
-				printf_ASSIGN(p);
+				printf_ASSIGN(p);printf("1111\n");
 				break;
 			case ADD:
-				printf_ADD(p);
+				printf_ADD(p);printf("1111\n");
 				break;
 			case SUB:
 				printf_SUB(p);
@@ -178,8 +180,10 @@ Operand new_operand(int kind,int value){//init a new operand
 	op->is_min = 0;
 	if(kind == 1)//constant
 		op->value = value;
-	else
+	else if(kind = 0)
 		op->var_no = var_no;
+	else 
+		op->label_no = value;
 	return op;
 }
 
@@ -188,6 +192,11 @@ Operand new_operand_name(char* name){
 	op->kind = 0;//var
 	op->is_min = 0;
 	strcpy(op->name,name);
+	return op;
+}
+Operand new_label(){
+	Operand op = new_operand(4,label_num);
+	label_num++;
 	return op;
 }
 
@@ -543,3 +552,4 @@ void printfile(node* p){
 	intercode_aly(p);
 	printf("over\n");
 }
+
