@@ -523,7 +523,7 @@ InterCodes translate_Args(node* Args,Operand *arg,int num){
 		Operand op = new_temp();
 		code1 = translate_Exp(Args->child, op);
 		arg[num++] = op;
-		code2 = translate_Args(Args,arg,num);
+		InterCodes code2 = translate_Args(Args,arg,num);
 		InterCodes_link(code1,code2);
 		return code1;
 	}
