@@ -6,13 +6,15 @@
 #include <stdarg.h>
 #include "node.h"
 #include "lex.yy.c"
-#include "intercode.c"
+#include "intercode.h"
 #include "semantic.h"
-extern char* output;
+
+extern int is_error;
 
 void show_tree(node *p, int depth);
 node *reduction(char *name,int line,int num,...);
 void free_tree(node *p);
+node* node_init();
 %}
 
 %union { 
@@ -43,7 +45,7 @@ void free_tree(node *p);
 
 %%
 Program		
-	:	ExtDefList			{$$ = reduction("Program", @1.first_line,1, $1);printf("\n");if(!is_error){	Stackhead_init();sem_analysis($$);/*show_tree($$, 0);*/intercode_aly($$);show_all(output);} free_tree($$); }
+	:	ExtDefList			{$$ = reduction("Program", @1.first_line,1, $1);printf("\n");if(!is_error){	Stackhead_init();sem_analysis($$);/*show_tree($$, 0);*/intercode_aly($$);} free_tree($$); }
 	;
 ExtDefList
 	:	ExtDef ExtDefList		{ $$ = reduction("ExtDefList", @1.first_line,2,$1, $2); }
@@ -153,6 +155,20 @@ Args
 yyerror(char* msg) {
 	is_error++;
 	printf("\nError type B at line %d: %s",yylineno,msg);
+}
+
+node* node_init(){
+	node *p;
+	if ((p = malloc(sizeof(node))) == NULL)
+		yyerror("out of memory\n");
+	p->type = 2;
+	p->child = NULL;
+	p->brother = NULL;
+	strcpy(p->name,"");
+	p->line = 0;
+	int node_int=0;
+	float node_float=0;
+	return p;	
 }
 
 node *reduction(char *name,int line,int num,...){

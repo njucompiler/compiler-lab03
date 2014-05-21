@@ -1,10 +1,12 @@
+
 #include "node.h"
 #include "intercode.h"
 #include <stdarg.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+
 FILE* fp;
-extern char* output;
 
 int var_no;
 InterCodes InterCodes_init(){
@@ -127,16 +129,16 @@ void show_all(char* output){
 			case MUL:
 				printf_MUL(p);
 				break;
-			case DIV:
+			case DIVI:
 				printf_DIV(p);
 				break;
 			case GOTO:
 				printf_GOTO(p);
 				break;
-			case LABEL:
-				printf_LAEBL(p);
+			case LAB:
+				printf_LABEL(p);
 				break;
-			case RETURN:
+			case RET:
 				printf_RETURN(p);
 				break;
 			
@@ -408,9 +410,10 @@ InterCodes translate_Dec(node* dec){
 		InterCodes codes1 = translate_Exp(dec->child->brother->brother, t1);
 		//Operand t1 = new_temp();
 		//InterCodes codes1 = translate_Vardec(child, t1);
-		codes3.code = new_interCode(0);
-		codes3.code.left = new_operand_name(dec->child->node_value);
-		codes3.code.right = t1;
+		InterCodes codes3 = InterCodes_init();
+		codes3->code = new_interCode(0);
+		codes3->code->assign.left = new_operand_name(dec->child->node_value);
+		codes3->code->assign.right = t1;
 		InterCodes_link(codes1,codes3);
 		//InterCodes_link(codes2,codes3);
 		return codes1;
@@ -475,7 +478,7 @@ InterCodes translate_Stmt(node* Stmt){
 	else if(strcmp(Stmt->child->node_value,"WHILE") == 0){
 
 	}
-	else if(Stmt->child->brother-)
+	//else if(Stmt->child->brother-)
 } 
 
 InterCodes translate_Stmtlist(node* Stmtlist){
@@ -492,6 +495,7 @@ InterCodes translate_Stmtlist(node* Stmtlist){
 }
 
 
+
 void intercode_aly(node *p){		
 	char name[20];
 	strcpy(name,p->name);
@@ -502,7 +506,7 @@ void intercode_aly(node *p){
 
 	}
 	else if(strcmp(name,"Exp")==0){
-		char* t1 = new_temp();
+		Operand t1 = new_temp();
 		translate_Exp(p,t1);
 		if(p->brother != NULL)
 			intercode_aly(p->brother);
@@ -523,3 +527,9 @@ void intercode_aly(node *p){
 		intercode_aly(p->brother);
 	return;
 }
+/*
+void printfile(node* p){
+	intercode_aly(p);
+	show_all(output);
+}
+*/
