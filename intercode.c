@@ -25,6 +25,15 @@ void InterCodes_link(InterCodes prev,InterCodes next){
 	next->prev = prev;
 }
 
+void add_to_head(InterCodes codes){
+	InterCodes temp = intercodes_head;
+	while(temp->next != NULL){
+		temp = temp->next;
+	}
+	temp->next = codes;
+	codes->prev = temp;
+}
+
 void head_init(){
 	intercodes_head = InterCodes_init();
 }
@@ -114,7 +123,8 @@ void show_all(char* output){
 		perror(output);
 		return ;
 	}
-	InterCodes p = intercodes_head;
+	printf("%s\n",output);
+	InterCodes p = intercodes_head->next;
 	while(p!=NULL){
 		switch(p->code->kind){
 			case ASSIGN:
@@ -200,7 +210,6 @@ InterCodes translate_Exp(node* exp,Operand place){
 		codes2->code = new_interCode(0);
 		codes2->code->assign.left = new_operand_name(exp->child->node_value);
 		codes2->code->assign.right = t;
-
 		InterCodes codes3 = InterCodes_init();
 		codes3->code = new_interCode(0);
 		codes3->code->assign.left = place;
@@ -240,10 +249,8 @@ InterCodes translate_Exp(node* exp,Operand place){
 		codes3->code->binop.result = place;
 		codes3->code->binop.op1 = t1;
 		codes3->code->binop.op2 = t2;
-
 		InterCodes_link(codes1,codes2);
 		InterCodes_link(codes2,codes3);
-
 		return codes1;
 	}
 
@@ -377,6 +384,7 @@ InterCodes translate_Exp(node* exp,Operand place){
 	else if(exp->exp_type == 24){
 		
 	}
+
 } 
 
 InterCodes translate_Cond(node* exp,Operand true_place,Operand false_place){
@@ -507,7 +515,8 @@ void intercode_aly(node *p){
 	}
 	else if(strcmp(name,"Exp")==0){
 		Operand t1 = new_temp();
-		translate_Exp(p,t1);
+		InterCodes expe = translate_Exp(p,t1);
+		add_to_head(expe);
 		if(p->brother != NULL)
 			intercode_aly(p->brother);
 		return;
@@ -521,15 +530,16 @@ void intercode_aly(node *p){
 	else if(strcmp(name,"Stmt")==0){
 
 	}
+
 	if(p->child != NULL)
 		intercode_aly(p->child);
 	if(p->brother != NULL)
 		intercode_aly(p->brother);
 	return;
 }
-/*
+
 void printfile(node* p){
+	head_init();
 	intercode_aly(p);
-	show_all(output);
+	printf("over\n");
 }
-*/

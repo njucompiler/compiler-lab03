@@ -13,6 +13,7 @@ int main(int argc, char** argv)
 	}
 	yyrestart(fr);
 	yyparse();
+	printf("%s\n",argv[2]);
 	show_all(argv[2]);
 	return 0;
 }
