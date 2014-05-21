@@ -113,15 +113,15 @@ void show_all(char* output){
 	{
 		perror(output);
 		return ;
-	}
-	InterCodes p = intercodes_head;
+	}printf("%s\n",output);
+	InterCodes p = intercodes_head;printf("1111\n");
 	while(p!=NULL){
 		switch(p->code->kind){
 			case ASSIGN:
-				printf_ASSIGN(p);
+				printf_ASSIGN(p);printf("1111\n");
 				break;
 			case ADD:
-				printf_ADD(p);
+				printf_ADD(p);printf("1111\n");
 				break;
 			case SUB:
 				printf_SUB(p);
