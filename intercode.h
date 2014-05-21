@@ -11,13 +11,15 @@ typedef struct InterCode_* InterCode;
 typedef struct InterCodes_* InterCodes;
 
 typedef struct Operand_ {
-	enum { VARIABLE, CONSTANT, ADDRESS, TEMP,LABEL} kind;
+	enum { VARIABLE, CONSTANT, ADDRESS, TEMP,LABEL,FUNC_op,PARAM_op} kind;
 	int is_min;
 	union {
 	char name[20];
 	int var_no;
 	int value;
 	int label_no;
+	char *func;
+	char *param;
 	} ;
 }Operand_;
 typedef struct InterCode_
@@ -42,8 +44,10 @@ void var_no_init();
 InterCode new_interCode(int kind);
 Operand new_operand(int kind,int value);
 Operand new_operand_name(char* name);
+Operand new_label();
 InterCodes translate_Exp(node* exp,Operand place);
 InterCodes translate_Stmtlist(node* Stmtlist);
+InterCodes translate_Args(node* Args,Operand *arg,int num);
 InterCodes InterCodes_init();
 void InterCodes_link(InterCodes prev,InterCodes next);
 void head_init();

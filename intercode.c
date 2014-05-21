@@ -501,8 +501,31 @@ InterCodes translate_Stmtlist(node* Stmtlist){
 	else
 		return NULL;
 }
-
-
+InterCodes translate_Args(node* Args,Operand *arg,int num){
+	if(Args->child->brother == NULL){
+		InterCodes code1;
+		Operand op = new_temp();
+		code1 = translate_Exp(Args->child, op);
+		arg[num++] = op;
+		return code1;
+	}
+	else{
+		InterCodes code1;
+		Operand op = new_temp();
+		code1 = translate_Exp(Args->child, op);
+		arg[num++] = op;
+		code2 = translate_Args(Args,arg,num);
+		InterCodes_link(code1,code2);
+		return code1;
+	}
+}
+/*InterCodes translate_Struct(node *Exp,,){
+	InterCodes code1;
+	node* ID;
+	if(Exp->child->brother->brother == ){
+		
+	}
+}*/
 
 void intercode_aly(node *p){		
 	char name[20];
