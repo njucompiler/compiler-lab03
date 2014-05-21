@@ -737,7 +737,7 @@ void add_read(){
 		SymbolTable[i]->type->kind = FUNC;
 		strcpy(SymbolTable[i]->type->func.RETURN,"INT");
 		SymbolTable[i]->type->func.declare = 1;
-		SymbolTable[i]->type->func.brohter = NULL;
+		SymbolTable[i]->type->func.brother = NULL;
 		SymbolTable[i]->child = NULL;
 		SymbolTable[i]->brother = NULL;
 	}
@@ -760,7 +760,7 @@ void add_write(){
 		SymbolTable[i]->type->kind = FUNC;
 		strcpy(SymbolTable[i]->type->func.RETURN,"INT");
 		SymbolTable[i]->type->func.declare = 1;
-		SymbolTable[i]->type.func.brohter = NULL;
+		SymbolTable[i]->type->func.brother = NULL;
 		SymbolTable[i]->child = NULL;
 		SymbolTable[i]->brother = NULL;
 		FuncVar *temp = (FuncVar*)malloc(sizeof(FuncVar));
