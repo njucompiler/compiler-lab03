@@ -393,20 +393,62 @@ InterCodes translate_Exp(node* exp,Operand place){
 
 InterCodes translate_Cond(node* exp,Operand true_place,Operand false_place){
 	if(strcmp(exp->child->name,"NOT")==0){
-		
+		return translate_Cond(exp->child->brother,true_place,false_place);
 	}
 	else if(strcmp(exp->child->brother->name,"RELOP")==0){
 		Operand t1 = new_temp();
 		Operand t2 = new_temp();
 		InterCodes codes1 = translate_Exp(exp->child,t1);
 		InterCodes codes2 = translate_Exp(exp->child->brother->brother,t2);
+		InterCodes codes3 = InterCodes_init();
+		codes3->code = new_interCode(COND);
+		codes3->code->cond.op1 = t1;
+		codes3->code->cond.op1 = t2;
+		strcpy(codes3->code->cond.op,exp->child->brother->node_value);
 		
+		InterCodes codes4 = InterCodes_init();
+		codes4->code = new_interCode(GOTO);
+		codes4->code->onlyop.op = true_place;
+
+		InterCodes codes5 = InterCodes_init()
+		codes5->code = new_interCode(GOTO);
+		codes5->code->onlyop.op = false_place;
+
+		InterCodes_link(codes1,codes2);
+		InterCodes_link(codes1,codes3);
+		InterCodes_link(codes1,codes4);
+		InterCodes_link(codes1,codes5);
+
+		return codes1;
 	}
 	else if(strcmp(exp->child->brother->name,"AND")==0){
-
+		Operand label1 = new_label();
+		InterCodes codes1 = translate_Cond(exp->child, label1, false_place);
+		InterCodes codes2 = translate_Cond(exp->child->brother->brother, true_place, false_place);
+		InterCodes codes3 = InterCodes_init(LAB);
+		codes3->code->onlyop.op = label1;
+		
+		InterCodes_link(codes1,codes3);
+		InterCodes_link(codes1,codes2);
+		return codes1;
 	}
 	else if(strcmp(exp->child->brother->name,"OR")==0){
-
+		Operand label1 = new_label();
+		InterCodes codes1 = translate_Cond(exp->child, true_place, label1);
+		InterCodes codes2 = translate_Cond(exp->child->brother->brother, true_place, false_place);
+		InterCodes codes3 = InterCodes_init(LAB);
+		codes3->code->onlyop.op = label1;
+		
+		InterCodes_link(codes1,codes3);
+		InterCodes_link(codes1,codes2);
+		return codes1;
+	}
+	else{
+		/*Operand t1 = new_temp()
+		InterCodes codes1 = translate_Exp(Exp, sym_table, t1)
+		code2 = [IF t1 != #0 GOTO label_true]
+		return code1 + code2 + [GOTO label_false]
+		*/
 	}
 }
 
@@ -709,6 +751,7 @@ void printfile(node* p){
 	optimize();
 	printf("over\n");
 }
+
 int getSize(Type p){
 	int size = 0;
 	if(p->structure->type == Int||p->structure->type == Float)

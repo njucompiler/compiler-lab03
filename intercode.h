@@ -11,9 +11,10 @@ typedef struct InterCode_* InterCode;
 typedef struct InterCodes_* InterCodes;
 
 typedef struct Operand_ {
-	enum { VARIABLE, CONSTANT, ADDRESS, TEMP,LABEL,FUNC_op,PARAM_op,ADDR_op} kind;
+	enum { VARIABLE, CONSTANT, ADDRESS, TEMP, LABEL, FUNC_op, PARAM_op, ADDR_op, op} kind;
 	int is_min;
 	union {
+	char op[3];//==,<=,>=,!=,>,<
 	char name[20];
 	int var_no;
 	int value;
@@ -24,11 +25,12 @@ typedef struct Operand_ {
 }Operand_;
 typedef struct InterCode_
 {
-	enum { ASSIGN, ADD, SUB, MUL, DIVI, LAB, GOTO, RET, ADDR} kind;
+	enum { ASSIGN, ADD, SUB, MUL, DIVI, LAB, GOTO, RET, ADDR, COND} kind;
 	union {
 		struct { Operand right, left; } assign;
 		struct { Operand result, op1, op2; } binop;
 		struct { Operand op; }onlyop;
+		struct {Operand op1, op, op2}cond;
 		};
 }InterCode_;
 
@@ -46,6 +48,7 @@ Operand new_operand_name(char* name);
 Operand new_label();
 Operand new_temp();
 InterCodes translate_Exp(node* exp,Operand place);
+InterCodes translate_Cond(node* exp,Operand true_place,Operand false_place);
 InterCodes translate_Stmtlist(node* Stmtlist);
 InterCodes translate_Args(node* Args,Operand *arg,int num);
 InterCodes translate_Struct(node *Exp);
