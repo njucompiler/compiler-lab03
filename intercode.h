@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "node.h"
+#include "type.h"
 
 typedef struct Operand_* Operand;
 typedef struct InterCode_* InterCode;
@@ -48,8 +49,8 @@ Operand new_temp();
 InterCodes translate_Exp(node* exp,Operand place);
 InterCodes translate_Stmtlist(node* Stmtlist);
 InterCodes translate_Args(node* Args,Operand *arg,int num);
-InterCodes translate_Struct(node *Exp);
-InterCodes translate_Array(node *Exp);
+InterCodes translate_Struct(node *Exp,Operand place);
+InterCodes translate_Array(node *Exp,Operand place);
 InterCodes InterCodes_init();
 void InterCodes_link(InterCodes prev,InterCodes next);
 void head_init();
@@ -64,7 +65,7 @@ void printf_LABEL(InterCodes p);
 void printf_GOTO(InterCodes p);
 void printf_RETURN(InterCodes p);
 void show_all(char* output);
-int getSize(char* p);
+int getSize(Type p);
 
 void optimize();
 Operand get_left(InterCodes codes);
