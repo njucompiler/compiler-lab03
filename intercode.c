@@ -122,6 +122,24 @@ void printf_RETURN(InterCodes q){
 	fputs("RETURN ",fp);
 	printf_Operand(p->onlyop.op);
 }
+void printf_CALL(InterCodes q){
+	InterCode p = q->code;
+	printf_operand(p->assign.left);
+	fputs(" :=CALL ",fp);
+	printf_operand(p->assign.right);
+}
+void printf_DEC(InterCodes q){
+	InterCode p = q->code;
+	fputs("DEC ",fp);
+	printf_operand(p->assign.left);
+	fputs(" ",fp);
+	printf_operand(p->asssign.right);
+}
+void printf_ARG(InterCodes q){
+	InterCode p = q->code;
+	fputs("ARG ");
+	printf_operand(p->onlyop.op);
+}
 void show_all(char* output){
 	fp = fopen(output,"w");
 	if ( !fp )
