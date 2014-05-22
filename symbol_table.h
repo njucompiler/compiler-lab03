@@ -99,6 +99,19 @@ int Find(char *name){//查找该名字是否在变量表
 	}
 	return 0;
 }
+FieldList Findname(char *name){
+	int i = hash_pjw(name);
+	if(SymbolTable[i] == NULL){
+		return 0;
+	}
+	FieldList p = SymbolTable[i];
+	while(p!=NULL){
+		if(strcmp(p->name,name) == 0)
+			break;
+		p = p->child;
+	}
+	return p;
+}
 char *get_Array(char *name){//返回数组存储元素的类型
 	int i = hash_pjw(name);
 	FieldList p = SymbolTable[i];
@@ -157,6 +170,41 @@ char* FindStruct(char *name,char *insname){//确定inname是否在该struct中
 	}
 	return "NULL";
 }
+/*char *FindStructType(char *name,char *insname){			//查找sturct name 中 insname的类型
+	int i = hash_pjw(name);
+	FieldList p = SymbolTable[i];
+	while(p!=NULL){
+		if(strcmp(p->name,name) == 0)
+			break;
+		p = p->child;
+	}
+	char sname[20];
+	strcpy(sname,p->type->name);
+	int j = hash_pjw(sname);
+	FieldList q = SymbolTable[j];
+	while(q!=NULL){
+		if(strcmp(q->name,sname) == 0)
+			break;
+		q = q->child;
+	}
+	while(q->brother!=NULL){
+		q=q->brother;
+		if(strcmp(q->name,insname)==0){
+			if(q->type->kind == Int)
+				return "int";
+			else if(q->type->kind == Float)
+				return "float";
+			else if(q->type->kind == ARRAY){
+				//return "array";
+				return get_Array(q->name);
+			}
+			else{
+				return q->type->name;
+			}
+		}
+	}
+	return "NULL";
+}*/
 char *finds(char *name){
 	int i = hash_pjw(name);
 	FieldList p = SymbolTable[i];

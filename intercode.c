@@ -180,8 +180,6 @@ Operand new_operand(int kind,int value){//init a new operand
 	op->is_min = 0;
 	if(kind == 1)//constant
 		op->value = value;
-	else if(kind = 0)
-		op->var_no = var_no;
 	else 
 		op->label_no = value;
 	return op;
@@ -528,14 +526,116 @@ InterCodes translate_Args(node* Args,Operand *arg,int num){
 		return code1;
 	}
 }
-/*InterCodes translate_Struct(node *Exp,,){
-	InterCodes code1;
-	node* ID;
-	if(Exp->child->brother->brother == ){
-		
+InterCodes translate_Struct(node *Exp,Operand place){
+	InterCodes code1 = InterCodes_init();
+	int size = 0;
+	if(strcmp(Exp->child->child->name,"ID") == 0){		//ID1.ID2
+		node *ID2 = Exp->child->brother->brother;
+		node *ID1 = Exp->child;
+		char typename[20];
+		strcpy(typename,FindStruct(ID1->node_value,ID2->node_value));
+		FieldList p = Findname(ID1->child->node_value);	
+		p = p->brother;
+		while(p!=NULL){
+			if(strcmp(p->name,Exp->child->brother->brother->child->node_value) == 0)
+				break;
+			size = size + getSize(p->type);
+			p = p->brother;
+		}	
+		Operand op1 = new_operand_name(ID1->child->node_value);
+		Operand op2 = new_operand(1,size);
+		code1->code->kind = ADDR;
+		code1->code->result = place;
+		code1->code->binop.op1 = op1;
+		code1->code->binop.op2 = op2;
+		place->kind = ADDR_op;
+		return code1;
 	}
-}*/
+	else if(strcpy(Exp->child->child->name,"Exp") == 0){
+		InterCodes code2 = InterCodes_init();
+		node *ID1 = Exp->child;
+		Operand t1 = new_temp();
+		code1 = translate_structure(Exp->child, t1);
+		FieldList p = Findname(ID1->child->node_value);	
+		p = p->brother;
+		while(p!=NULL){
+			if(strcmp(p->name,Exp->child->brother->brother->child->node_value) == 0)
+				break;
+			size = size + getSize(p->type);
+			p = p->brother;
+		}
+		Operand op1 = new_operand_name(ID1->child->node_value);
+		Operand op2 = new_operand(1,size);
+		code2 = gen_binop(IR_ADD, t2, t3, c1);
+		code2->code->kind = ADDR;
+		code2->code->result = place;
+		code2->code->binop.op1 = op1;
+		code2->code->binop.op2 = op2;
+		InterCodes_link(code1,code2);
+		place->kind = ADDR_op;
+		return code1;
+	}
+}
+InterCodes translate_Array(node *Exp,Operand place){
+	InterCodes code1 = InterCodes_init();			
+	FieldList p = Findname(Exp->child->child->node_value);
+	int size =0;
+	//Operand t ;
+	if(strcpy(Exp->child->child->name,"ID") == 0){	//Exp[Exp]
+		if(p->type->array.elem->kind == STRUCTURE)
+			size = getSize(p->type->array.elem);
+		else size = 4;
+		Operand op1 = new_operand_name(Exp->child->child->node_value);
+		InterCodes code2,code3,code4;
+		Operand t1 = new_temp();
+		code2 = translate_Exp(Exp->child->brother->brother,t1)			//翻译[]中的exp
+		Operand t2 = new_temp();
+		Operand c1 = new_operand(1,size);
+		code3->code->kind = MUL;
+		code3->code->binop.result = t2;
+		code3->code->binop.op1 = t1;
+		code3->code->binop.re2 = c1;
+		code4->code->kind = ADDR;
+		code4->code->binop->result = place;
+		code4->code->binop.op1 = op1;
+		code4->code->binop.op2 = t2;
+		InterCodes_link(code1,code2);
+		InterCodes_link(code1,code3);
+		InterCodes_link(code1,code4);
+		place->kind = ADDR_op;
+		return code1;
+	}
+	else if(strcpy(Exp->child->child->name,"Exp") == 0)			//Exp[Exp][Exp]
+	{
+		if(p->type->array.elem->kind == STRUCTURE)
+			size = getSize(p->type->array.elem);
+		else size = 4;
+		InterCodes code = InterCodes_init();
+		Operand temp = new_temp();
+		code = translate_Array(Exp->child,temp);
+		Operand op1 = new_operand_name(Exp->child->child->node_value);
+		InterCodes code2,code3,code4;
+		Operand t1 = new_temp();
+		code2 = translate_Exp(Exp->child->brother->brother,t1)			//翻译[]中的exp
+		Operand t2 = new_temp();
+		Operand c1 = new_operand(1,size);
+		code3->code->kind = MUL;
+		code3->code->binop.result = t2;
+		code3->code->binop.op1 = t1;
+		code3->code->binop.re2 = c1;
+		code4->code->kind = ADDR;
+		code4->code->binop->result = place;
+		code4->code->binop.op1 = op1;
+		code4->code->binop.op2 = t2;
+		InterCodes_link(code1,code2);
+		InterCodes_link(code1,code3);
+		InterCodes_link(code1,code4);
+		InterCodes_link(code1,code);
+		place->kind = ADDR_op;
+		return code1;
+	}
 
+}
 void intercode_aly(node *p){		
 	char name[20];
 	strcpy(name,p->name);
@@ -574,5 +674,22 @@ void printfile(node* p){
 	head_init();
 	intercode_aly(p);
 	printf("over\n");
+}
+int getSize(Type p){
+	int size = 0;
+	if(p->structure->type == Int||p->structure->type == Float)
+		size = size + 4;
+	else if(p->structure->type == ARRAY){
+		size = getSize(p->structure->array.elem);
+		size =  size * p->structure->array.size;
+	}
+	else{
+		FieldList q = p->structure;
+		while(q!=NULL){
+			size = size + getSize(q);
+			q = q->brother;
+		}
+	}
+	return size;
 }
 

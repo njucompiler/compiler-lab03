@@ -11,7 +11,7 @@ typedef struct InterCode_* InterCode;
 typedef struct InterCodes_* InterCodes;
 
 typedef struct Operand_ {
-	enum { VARIABLE, CONSTANT, ADDRESS, TEMP,LABEL,FUNC_op,PARAM_op} kind;
+	enum { VARIABLE, CONSTANT, ADDRESS, TEMP,LABEL,FUNC_op,PARAM_op,ADDR_op} kind;
 	int is_min;
 	union {
 	char name[20];
@@ -24,7 +24,7 @@ typedef struct Operand_ {
 }Operand_;
 typedef struct InterCode_
 {
-	enum { ASSIGN, ADD, SUB, MUL, DIVI, LAB, GOTO, RET} kind;
+	enum { ASSIGN, ADD, SUB, MUL, DIVI, LAB, GOTO, RET, ADDR} kind;
 	union {
 		struct { Operand right, left; } assign;
 		struct { Operand result, op1, op2; } binop;
@@ -45,9 +45,12 @@ InterCode new_interCode(int kind);
 Operand new_operand(int kind,int value);
 Operand new_operand_name(char* name);
 Operand new_label();
+Operand new_temp();
 InterCodes translate_Exp(node* exp,Operand place);
 InterCodes translate_Stmtlist(node* Stmtlist);
 InterCodes translate_Args(node* Args,Operand *arg,int num);
+InterCodes translate_Struct(node *Exp);
+InterCodes translate_Array(node *Exp);
 InterCodes InterCodes_init();
 void InterCodes_link(InterCodes prev,InterCodes next);
 void head_init();
@@ -62,5 +65,6 @@ void printf_LABEL(InterCodes p);
 void printf_GOTO(InterCodes p);
 void printf_RETURN(InterCodes p);
 void show_all(char* output);
+int getSize(char* p);
 
 #endif
