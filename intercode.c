@@ -37,10 +37,9 @@ void add_to_head(InterCodes codes){
 
 void head_init(){
 	intercodes_head = InterCodes_init();
-}
-void var_no_init(){
 	var_no = 1;
 }
+
 void printf_Operand(Operand p){
 	switch(p->kind){
 		case VARIABLE:
@@ -53,7 +52,7 @@ void printf_Operand(Operand p){
 			fprintf(fp,"#%d",p->value);
 			break;
 		case TEMP:
-			fprintf(fp,"%s",p->name);
+			fprintf(fp,"t%d",p->var_no);
 			break;
 		case LAB:
 			fprintf(fp,"label%d:",p->label_no);
@@ -124,16 +123,14 @@ void show_all(char* output){
 		perror(output);
 		return ;
 	}
-	printf("%s\n",output);
 	InterCodes p = intercodes_head->next;
-	printf("%s\n",output);
 	while(p!=NULL){
 		switch(p->code->kind){
 			case ASSIGN:
-				printf_ASSIGN(p);printf("1111\n");
+				printf_ASSIGN(p);
 				break;
 			case ADD:
-				printf_ADD(p);printf("1111\n");
+				printf_ADD(p);
 				break;
 			case SUB:
 				printf_SUB(p);
@@ -211,7 +208,7 @@ InterCodes translate_Exp(node* exp,Operand place){
 	//-------------------------------------------------Exp ASSIGNOP Exp
 	if(exp->exp_type == 7){
 		Operand t = new_temp();		
-		InterCodes codes1 = InterCodes_init();
+		InterCodes codes1 ;
 		InterCodes codes2 = InterCodes_init();
 		codes1 = translate_Exp(exp->child->brother->brother,t);
 		codes2->code = new_interCode(0);
@@ -383,7 +380,7 @@ InterCodes translate_Exp(node* exp,Operand place){
 		InterCodes codes = InterCodes_init();
 		codes->code = new_interCode(0);
 		codes->code->assign.right = new_operand(1,exp->node_int);
-		codes->code->assign.left = new_operand(3,var_no-1);
+		codes->code->assign.left = place;
 		return codes;
 	}
 
@@ -651,6 +648,7 @@ void intercode_aly(node *p){
 		add_to_head(expe);
 		if(p->brother != NULL)
 			intercode_aly(p->brother);
+		printf("exp\n");
 		return;
 	}
 	else if(strcmp(name,"CompSt")==0){
@@ -670,9 +668,45 @@ void intercode_aly(node *p){
 	return;
 }
 
+/*int op_assign(Operand op1,Operand op2){
+	if(op1->kind != op2->kind)
+
+}*/
+
+Operand get_left(InterCodes codes){
+	if(codes->code->kind == 0)
+		return codes->code->assign.left;
+	else
+		return codes->code->binop.result;
+}
+
+void optimize(){
+	InterCodes temp = intercodes_head->next;
+	while(temp->next != NULL){
+		if((temp->code->kind == 0 || temp->code->kind == 1 || temp->code->kind == 2 || temp->code->kind == 3 || temp->code->kind == 4)&& (temp->next->code->kind == 0)){
+			Operand left = get_left(temp);
+			if(left == temp->next->code->assign.right){
+				if(temp->code->kind == 0)
+					temp->code->assign.left = temp->next->code->assign.left;
+				else
+					 temp->code->binop.result = temp->next->code->assign.left;
+
+				InterCodes codes = temp->next;
+				if(temp->next->next != NULL){
+					temp->next->next->prev = temp;
+				}
+				temp->next = codes->next;
+				free(codes);
+			}
+		}
+		temp = temp->next;
+	}
+}
+
 void printfile(node* p){
 	head_init();
 	intercode_aly(p);
+	optimize();
 	printf("over\n");
 }
 int getSize(Type p){
