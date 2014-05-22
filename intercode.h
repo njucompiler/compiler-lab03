@@ -40,7 +40,6 @@ typedef struct InterCodes_
 
 InterCodes intercodes_head;
 
-void var_no_init();
 InterCode new_interCode(int kind);
 Operand new_operand(int kind,int value);
 Operand new_operand_name(char* name);
@@ -62,5 +61,8 @@ void printf_LABEL(InterCodes p);
 void printf_GOTO(InterCodes p);
 void printf_RETURN(InterCodes p);
 void show_all(char* output);
+
+void optimize();
+Operand get_left(InterCodes codes);
 
 #endif

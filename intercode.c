@@ -37,10 +37,9 @@ void add_to_head(InterCodes codes){
 
 void head_init(){
 	intercodes_head = InterCodes_init();
-}
-void var_no_init(){
 	var_no = 1;
 }
+
 void printf_Operand(Operand p){
 	switch(p->kind){
 		case VARIABLE:
@@ -569,9 +568,45 @@ void intercode_aly(node *p){
 	return;
 }
 
+/*int op_assign(Operand op1,Operand op2){
+	if(op1->kind != op2->kind)
+
+}*/
+
+Operand get_left(InterCodes codes){
+	if(codes->code->kind == 0)
+		return codes->code->assign.left;
+	else
+		return codes->code->binop.result;
+}
+
+void optimize(){
+	InterCodes temp = intercodes_head->next;
+	while(temp->next != NULL){
+		if((temp->code->kind == 0 || temp->code->kind == 1 || temp->code->kind == 2 || temp->code->kind == 3 || temp->code->kind == 4)&& (temp->next->code->kind == 0)){
+			Operand left = get_left(temp);
+			if(left == temp->next->code->assign.right){
+				if(temp->code->kind == 0)
+					temp->code->assign.left = temp->next->code->assign.left;
+				else
+					 temp->code->binop.result = temp->next->code->assign.left;
+
+				InterCodes codes = temp->next;
+				if(temp->next->next != NULL){
+					temp->next->next->prev = temp;
+				}
+				temp->next = codes->next;
+				free(codes);
+			}
+		}
+		temp = temp->next;
+	}
+}
+
 void printfile(node* p){
 	head_init();
 	intercode_aly(p);
+	optimize();
 	printf("over\n");
 }
 
