@@ -71,6 +71,9 @@ void printf_DIV(InterCodes p);
 void printf_LABEL(InterCodes p);
 void printf_GOTO(InterCodes p);
 void printf_RETURN(InterCodes p);
+void printf_CALL(InterCodes q);
+void printf_DEC(InterCodes q);
+void printf_ARG(InterCodes q);
 void show_all(char* output);
 int getSize(Type p);
 
