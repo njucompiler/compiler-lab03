@@ -53,7 +53,7 @@ void printf_Operand(Operand p){
 			fprintf(fp,"#%d",p->value);
 			break;
 		case TEMP:
-			fprintf(fp,"%s",p->name);
+			fprintf(fp,"t%d",p->var_no);
 			break;
 		case LAB:
 			fprintf(fp,"label%d:",p->label_no);
@@ -124,16 +124,14 @@ void show_all(char* output){
 		perror(output);
 		return ;
 	}
-	printf("%s\n",output);
 	InterCodes p = intercodes_head->next;
-	printf("%s\n",output);
 	while(p!=NULL){
 		switch(p->code->kind){
 			case ASSIGN:
-				printf_ASSIGN(p);printf("1111\n");
+				printf_ASSIGN(p);
 				break;
 			case ADD:
-				printf_ADD(p);printf("1111\n");
+				printf_ADD(p);
 				break;
 			case SUB:
 				printf_SUB(p);
@@ -213,7 +211,7 @@ InterCodes translate_Exp(node* exp,Operand place){
 	//-------------------------------------------------Exp ASSIGNOP Exp
 	if(exp->exp_type == 7){
 		Operand t = new_temp();		
-		InterCodes codes1 = InterCodes_init();
+		InterCodes codes1 ;
 		InterCodes codes2 = InterCodes_init();
 		codes1 = translate_Exp(exp->child->brother->brother,t);
 		codes2->code = new_interCode(0);
@@ -385,7 +383,7 @@ InterCodes translate_Exp(node* exp,Operand place){
 		InterCodes codes = InterCodes_init();
 		codes->code = new_interCode(0);
 		codes->code->assign.right = new_operand(1,exp->node_int);
-		codes->code->assign.left = new_operand(3,var_no-1);
+		codes->code->assign.left = place;
 		return codes;
 	}
 
@@ -551,6 +549,7 @@ void intercode_aly(node *p){
 		add_to_head(expe);
 		if(p->brother != NULL)
 			intercode_aly(p->brother);
+		printf("exp\n");
 		return;
 	}
 	else if(strcmp(name,"CompSt")==0){
