@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "type.h"
 
 FILE* fp;
 
@@ -54,13 +55,18 @@ void printf_Operand(Operand p){
 		case TEMP:
 			fprintf(fp,"t%d",p->var_no);
 			break;
-		case LAB:
+		case LABEL:
 			fprintf(fp,"label%d:",p->label_no);
 			break;
-		case GOTO:
-			fprintf(fp,"label%d",p->label_no);
-		case RET:
-			fprintf(fp,"%s",p->name);
+		case FUNC_op:
+			fprintf(fp,"%s",p->func);
+			break;
+		case PARAM_op:
+			fprintf(fp,"%s",p->param);
+			break;
+		case ADDR_op:
+			fprintf(fp,"*%s",p->name);
+			break;
 	}
 }
 void printf_ASSIGN(InterCodes q){
@@ -584,7 +590,7 @@ InterCodes translate_Struct(node *Exp,Operand place){
 		Operand op1 = new_operand_name(ID1->child->node_value);
 		Operand op2 = new_operand(1,size);
 		code1->code->kind = ADDR;
-		code1->code->result = place;
+		code1->code->binop.result = place;
 		code1->code->binop.op1 = op1;
 		code1->code->binop.op2 = op2;
 		place->kind = ADDR_op;
@@ -594,7 +600,7 @@ InterCodes translate_Struct(node *Exp,Operand place){
 		InterCodes code2 = InterCodes_init();
 		node *ID1 = Exp->child;
 		Operand t1 = new_temp();
-		code1 = translate_structure(Exp->child, t1);
+		code1 = translate_Struct(Exp->child, t1);
 		FieldList p = Findname(ID1->child->node_value);	
 		p = p->brother;
 		while(p!=NULL){
@@ -605,9 +611,8 @@ InterCodes translate_Struct(node *Exp,Operand place){
 		}
 		Operand op1 = new_operand_name(ID1->child->node_value);
 		Operand op2 = new_operand(1,size);
-		code2 = gen_binop(IR_ADD, t2, t3, c1);
 		code2->code->kind = ADDR;
-		code2->code->result = place;
+		code2->code->binop.result = place;
 		code2->code->binop.op1 = op1;
 		code2->code->binop.op2 = op2;
 		InterCodes_link(code1,code2);
@@ -627,15 +632,15 @@ InterCodes translate_Array(node *Exp,Operand place){
 		Operand op1 = new_operand_name(Exp->child->child->node_value);
 		InterCodes code2,code3,code4;
 		Operand t1 = new_temp();
-		code2 = translate_Exp(Exp->child->brother->brother,t1)			//翻译[]中的exp
+		code2 = translate_Exp(Exp->child->brother->brother,t1);			//翻译[]中的exp
 		Operand t2 = new_temp();
 		Operand c1 = new_operand(1,size);
 		code3->code->kind = MUL;
 		code3->code->binop.result = t2;
 		code3->code->binop.op1 = t1;
-		code3->code->binop.re2 = c1;
+		code3->code->binop.op2 = c1;
 		code4->code->kind = ADDR;
-		code4->code->binop->result = place;
+		code4->code->binop.result = place;
 		code4->code->binop.op1 = op1;
 		code4->code->binop.op2 = t2;
 		InterCodes_link(code1,code2);
@@ -655,15 +660,15 @@ InterCodes translate_Array(node *Exp,Operand place){
 		Operand op1 = new_operand_name(Exp->child->child->node_value);
 		InterCodes code2,code3,code4;
 		Operand t1 = new_temp();
-		code2 = translate_Exp(Exp->child->brother->brother,t1)			//翻译[]中的exp
+		code2 = translate_Exp(Exp->child->brother->brother,t1);			//翻译[]中的exp
 		Operand t2 = new_temp();
 		Operand c1 = new_operand(1,size);
 		code3->code->kind = MUL;
 		code3->code->binop.result = t2;
 		code3->code->binop.op1 = t1;
-		code3->code->binop.re2 = c1;
+		code3->code->binop.op2 = c1;
 		code4->code->kind = ADDR;
-		code4->code->binop->result = place;
+		code4->code->binop.result = place;
 		code4->code->binop.op1 = op1;
 		code4->code->binop.op2 = t2;
 		InterCodes_link(code1,code2);
@@ -754,16 +759,16 @@ void printfile(node* p){
 
 int getSize(Type p){
 	int size = 0;
-	if(p->structure->type == Int||p->structure->type == Float)
+	if(p->kind == Int||p->kind == Float)
 		size = size + 4;
-	else if(p->structure->type == ARRAY){
-		size = getSize(p->structure->array.elem);
-		size =  size * p->structure->array.size;
+	else if(p->kind == ARRAY){
+		size = getSize(p->array.elem);
+		size =  size * p->array.size;
 	}
 	else{
 		FieldList q = p->structure;
 		while(q!=NULL){
-			size = size + getSize(q);
+			size = size + getSize(q->type);
 			q = q->brother;
 		}
 	}
