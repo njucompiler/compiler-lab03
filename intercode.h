@@ -30,6 +30,7 @@ typedef struct InterCode_
 		struct { Operand right, left; } assign;
 		struct { Operand result, op1, op2; } binop;
 		struct { Operand op; }onlyop;
+		struct { Operand x, y, z; enum{ EQUAL, NEQUAL, MORE, LESS,MORE_E, LESS_E}RELOP; }cond;
 		};
 }InterCode_;
 

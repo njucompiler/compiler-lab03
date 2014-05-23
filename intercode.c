@@ -140,6 +140,34 @@ void printf_ARG(InterCodes q){
 	fputs("ARG ");
 	printf_operand(p->onlyop.op);
 }
+void printf_COND(InterCodes q){
+	InterCode p = q->code;
+	fputs("IF ");
+	printf_operand(p->cond.x);
+	switch(p->cond.RELOP){
+		case EQUAL:
+			fputs(" == ");
+		break;
+		case NEQUAL:
+			fputs(" != ");
+		break;
+		case MORE:
+			fputs(" > ");
+		break;
+		case LESS:
+			fputs(" < ");
+		break;
+		case MORE_E:
+			fputs(" >= ");
+		break;
+		case LESS_E:
+			fputs(" >= ");
+		break;
+	}
+	printf_operand(p->cond.y);
+	fputs(" goto ");
+	printf_operand(p->cond.z);
+}
 void show_all(char* output){
 	fp = fopen(output,"w");
 	if ( !fp )
