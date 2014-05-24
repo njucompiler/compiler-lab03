@@ -540,7 +540,7 @@ InterCodes translate_Exp(node* exp,Operand place){
 	else if(exp->exp_type == 18){
 		Operand* arg_list = (Operand*)malloc(sizeof(Operand)*8);
 		int arg_num;
-		InterCodes codes1 = translate_Args(Args,arg_list,&arg_num);
+		InterCodes codes1 = translate_Args(exp->child->brother->brother,arg_list,&arg_num);
 		if (strcmp(exp->child->name,"write")==0){
 			InterCodes codes2 = InterCodes_init();
 			codes2->code = new_interCode(WRITE);
@@ -550,7 +550,8 @@ InterCodes translate_Exp(node* exp,Operand place){
 			
 			return codes1;
 		}
-   		for(int i = 0;i < arg_num;i++){
+		int i = 0;
+   		for(;i < arg_num;i++){
    			InterCodes codes2 = InterCodes_init();
    			codes2->code = new_interCode(ARG);
    			codes2->code->onlyop.op = arg_list[i];
@@ -566,8 +567,8 @@ InterCodes translate_Exp(node* exp,Operand place){
 
 	//---------------------------------------------------ID LP RP
 	else if(exp->exp_type == 19){
+		InterCodes codes = InterCodes_init();
 		if(strcmp(exp->child->name,"read")==0){
-			InterCodes codes = InterCodes_init();
 			codes->code = new_interCode(READ);
 			codes->code->onlyop.op = place;
 		}
@@ -578,7 +579,6 @@ InterCodes translate_Exp(node* exp,Operand place){
 
 		}*/
 		else{
-			InterCodes codes = InterCodes_init();
 			codes->code = new_interCode(CALL);
 			codes->code->assign.left = place;
 			codes->code->assign.right = new_operand_name(exp->child->name); 
@@ -588,12 +588,12 @@ InterCodes translate_Exp(node* exp,Operand place){
 
 	//--------------------------------------------------Exp LB Exp RB
 	else if(exp->exp_type == 20){
-		
+		return translate_Array(exp,place);
 	}
 
 	//--------------------------------------------------Exp DOT ID
-	else if(exp->exp_type == 21){	
-		
+	else if(exp->exp_type == 21){
+		return translate_Struct(exp,place);
 	}
 
 	//---------------------------------------------------ID
@@ -934,14 +934,14 @@ InterCodes translate_Args(node* Args,Operand *arg,int* num){
 		InterCodes code1;
 		Operand op = new_temp();
 		code1 = translate_Exp(Args->child, op);
-		arg[num++] = op;
+		arg[*num++] = op;
 		return code1;
 	}
 	else{
 		InterCodes code1;
 		Operand op = new_temp();
 		code1 = translate_Exp(Args->child, op);
-		arg[num++] = op;
+		arg[*num++] = op;
 		InterCodes code2 = translate_Args(Args,arg,num);
 		InterCodes_link(code1,code2);
 		return code1;
@@ -1062,9 +1062,6 @@ void intercode_aly(node *p){
 	if(strcmp(name,"Def")==0){
 	
 	}
-	else if(strcmp(name,"ExtDef")==0){
-
-	}
 	else if(strcmp(name,"Exp")==0){
 		Operand t1 = new_temp();
 		InterCodes expe = translate_Exp(p,t1);
@@ -1074,10 +1071,11 @@ void intercode_aly(node *p){
 		return;
 	}
 	else if(strcmp(name,"CompSt")==0){
-
-	}
-	else if(strcmp(name,"Args")==0){
-
+		InterCodes codes =	translate_Compst(p);
+		add_to_head(codes);
+		if(p->brother != NULL)
+			intercode_aly(p->brother);
+		return;
 	}
 	else if(strcmp(name,"Stmt")==0){
 		InterCodes codes = translate_Stmt(p);

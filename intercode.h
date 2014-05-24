@@ -58,7 +58,7 @@ InterCodes translate_Deflist(node* deflist);
 InterCodes translate_Cond(node* exp,Operand true_place,Operand false_place);
 InterCodes translate_Dec(node* dec);
 InterCodes translate_Declist(node* declist);
-InterCodes translate_Args(node* Args,Operand *arg,int num);
+InterCodes translate_Args(node* Args,Operand *arg,int *num);
 InterCodes translate_Struct(node *Exp,Operand place);
 InterCodes translate_Array(node *Exp,Operand place);
 InterCodes translate_VarDec(node* VarDec);
