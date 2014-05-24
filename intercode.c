@@ -20,11 +20,14 @@ InterCodes InterCodes_init(){
 }
 
 void InterCodes_link(InterCodes prev,InterCodes next){
-	InterCodes temp = prev;
-	if(temp == NULL){
-		printf("InterCodes_link error prev is NULL\n");
+	if(prev == NULL){
+		prev = next;
 		return;
 	}
+	else if(next == NULL){
+		return;
+	}
+	InterCodes temp = prev;
 	while(temp->next != NULL){
 		temp = temp->next;
 	}
@@ -33,6 +36,10 @@ void InterCodes_link(InterCodes prev,InterCodes next){
 }
 
 void add_to_head(InterCodes codes){
+	if(codes == NULL){
+		printf("null add to head\n");
+		return;
+	}
 	InterCodes temp = intercodes_head;
 	if(temp == NULL){
 		printf("InterCodes_link error prev is NULL\n");
@@ -741,20 +748,20 @@ InterCodes translate_Deflist(node* deflist){
 		codes1 = translate_Def(deflist->child);
 		codes2 = translate_Deflist(deflist->child->brother);
 		InterCodes_link(codes1,codes2);
-	return codes1;
+		return codes1;
 	}
 	else
 		return NULL;
 }
 
-InterCodes translate_Extdef(Node* ExtDef) {
+InterCodes translate_Extdef(node* ExtDef) {
 	InterCodes code1, code2;
 	//Specifier ExtDecList SEMI
-	if(strcmp(ExtDef->child->brother->node_value, "ExtDecList") == 0){
+	if(strcmp(ExtDef->child->brother->name, "ExtDecList") == 0){
 		return translate_Extdeclist(ExtDef->child->brother);
 	}
 	//Specifier FunDec CompSt
-	else if(strcmp(ExtDef->child->brother->node_value, "FunDec") == 0){
+	else if(strcmp(ExtDef->child->brother->name, "FunDec") == 0){
 		code1 = translate_Fundec(ExtDef->child->brother);
 		code2 = translate_Compst(ExtDef->child->brother->brother);
 		InterCodes_link(code1, code2);
@@ -765,13 +772,13 @@ InterCodes translate_Extdef(Node* ExtDef) {
 		return NULL;
 }
 
-InterCodes translate_Extdeclist(Node* Extdeclist) {
+InterCodes translate_Extdeclist(node* Extdeclist) {
 	InterCodes code1, code2;
 	if(Extdeclist->child->brother == NULL){		//VarDec
-		return translate_Vardec(child);
+		return translate_VarDec(Extdeclist->child);
 	}
 	else if(Extdeclist->child->brother != NULL && strcmp(Extdeclist->child->brother->node_value, "COMMA") == 0){		//VarDec COMMA ExtDecList
-		code1 = translate_Vardec(Extdeclist->child);
+		code1 = translate_VarDec(Extdeclist->child);
 		code2 = translate_Extdeclist(Extdeclist->child->brother->brother);
 		InterCodes_link(code1, code2);
 		return code1;
@@ -941,15 +948,16 @@ InterCodes translate_VarDec(node* VarDec){
 InterCodes translate_Fundec(node* Fundec){
 	node* ID = Fundec->child;
 	InterCodes code1 = InterCodes_init();
-	code1->code->kind = FUNC_I;
-	code1->code->onlyop.op->kind = FUNC_op;
-	strcpy(code1->code->onlyop.op->func,ID->node_value);
+	code1->code = new_interCode(FUNC_I);
+	code1->code->onlyop.op = new_operand_name(ID->node_value);
 	if(strcmp(ID->brother->brother->name,"VarList") == 0){			//ID LP VarList RP
 		FieldList p = Findname(ID->node_value);	
 		FuncVar *q = p->type->func.brother;
 		while(q != NULL){
 			InterCodes code2 = InterCodes_init();
-			code2->code->onlyop.op->kind = PARAM_op;
+			code2->code = new_interCode(PARAM_op);
+			code1->code->onlyop.op = (Operand)malloc(sizeof(Operand_));
+			code1->code->onlyop.op->kind = FUNC_op; 
 			strcpy(code1->code->onlyop.op->func,q->name);	
 			InterCodes_link(code1, code2);
 			q = q->next;
@@ -1089,8 +1097,12 @@ InterCodes translate_Array(node *Exp,Operand place){
 void intercode_aly(node *p){		
 	char name[20];
 	strcpy(name,p->name);
-	if(strcmp(name,"Def")==0){
-	
+	if(strcmp(name,"ExtDef")==0){
+		InterCodes codes = translate_Extdef(p);
+		add_to_head(codes);
+		if(p->brother != NULL)
+			intercode_aly(p->brother);
+		return;
 	}
 	else if(strcmp(name,"Exp")==0){
 		Operand t1 = new_temp();
