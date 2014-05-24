@@ -124,49 +124,28 @@ void printf_RETURN(InterCodes q){
 }
 void printf_CALL(InterCodes q){
 	InterCode p = q->code;
-	printf_operand(p->assign.left);
+	printf_Operand(p->assign.left);
 	fputs(" :=CALL ",fp);
-	printf_operand(p->assign.right);
+	printf_Operand(p->assign.right);
 }
 void printf_DEC(InterCodes q){
 	InterCode p = q->code;
 	fputs("DEC ",fp);
-	printf_operand(p->assign.left);
+	printf_Operand(p->assign.left);
 	fputs(" ",fp);
-	printf_operand(p->asssign.right);
+	printf_Operand(p->assign.right);
 }
 void printf_ARG(InterCodes q){
 	InterCode p = q->code;
-	fputs("ARG ");
-	printf_operand(p->onlyop.op);
+	fputs("ARG ",fp);
+	printf_Operand(p->onlyop.op);
 }
 void printf_COND(InterCodes q){
 	InterCode p = q->code;
-	fputs("IF ");
-	printf_operand(p->cond.x);
-	switch(p->cond.RELOP){
-		case EQUAL:
-			fputs(" == ");
-		break;
-		case NEQUAL:
-			fputs(" != ");
-		break;
-		case MORE:
-			fputs(" > ");
-		break;
-		case LESS:
-			fputs(" < ");
-		break;
-		case MORE_E:
-			fputs(" >= ");
-		break;
-		case LESS_E:
-			fputs(" >= ");
-		break;
-	}
-	printf_operand(p->cond.y);
-	fputs(" goto ");
-	printf_operand(p->cond.z);
+	fputs("IF ",fp);
+	printf_Operand(p->cond.op1);
+	fputs(p->cond.op->op,fp);
+	printf_Operand(p->cond.op2);
 }
 void show_all(char* output){
 	fp = fopen(output,"w");
@@ -278,17 +257,83 @@ InterCodes translate_Exp(node* exp,Operand place){
 	}
 	//-------------------------------------------------Exp AND Exp
 	else if(exp->exp_type == 8){
+		Operand	label1 = new_label()
+		Operand label2 = new_label()
+		InterCodes codes1 = InterCodes_init();
+		codes1->code = new_interCode(0);
+		codes1->code->assign.left = place;
+		codes1->code->assign.right = new_operand(1,0);
 
+		InterCodes codes2 = translate_Cond(exp, label1, label2);
+		
+		InterCodes codes3 = InterCodes_init();
+		codes3->code = new_interCode(5);
+		codes3->code->onlyop.op = label1;
+
+		InterCodes codes4 = InterCodes_init();
+		codes4->code = new_interCode(0);
+		codes4->code->assign.left = place;
+		codes4->code->assign.right = new_operand(1,1);
+
+		InterCodes_link(codes1,codes2);
+		InterCodes_link(codes1,codes3);
+		InterCodes_link(codes1,codes4);
+		
+		return codes1;
 	}
 
 	//-------------------------------------------------Exp OR Exp
 	else if(exp->exp_type == 9){
+		Operand	label1 = new_label()
+		Operand label2 = new_label()
+		InterCodes codes1 = InterCodes_init();
+		codes1->code = new_interCode(0);
+		codes1->code->assign.left = place;
+		codes1->code->assign.right = new_operand(1,0);
 
+		InterCodes codes2 = translate_Cond(exp, label1, label2);
+		
+		InterCodes codes3 = InterCodes_init();
+		codes3->code = new_interCode(5);
+		codes3->code->onlyop.op = label1;
+
+		InterCodes codes4 = InterCodes_init();
+		codes4->code = new_interCode(0);
+		codes4->code->assign.left = place;
+		codes4->code->assign.right = new_operand(1,1);
+
+		InterCodes_link(codes1,codes2);
+		InterCodes_link(codes1,codes3);
+		InterCodes_link(codes1,codes4);
+		
+		return codes1;
 	}
 
 	//-------------------------------------------------Exp RELOP Exp
 	else if(exp->exp_type == 10){
+		Operand	label1 = new_label()
+		Operand label2 = new_label()
+		InterCodes codes1 = InterCodes_init();
+		codes1->code = new_interCode(0);
+		codes1->code->assign.left = place;
+		codes1->code->assign.right = new_operand(1,0);
+
+		InterCodes codes2 = translate_Cond(exp, label1, label2);
 		
+		InterCodes codes3 = InterCodes_init();
+		codes3->code = new_interCode(5);
+		codes3->code->onlyop.op = label1;
+
+		InterCodes codes4 = InterCodes_init();
+		codes4->code = new_interCode(0);
+		codes4->code->assign.left = place;
+		codes4->code->assign.right = new_operand(1,1);
+
+		InterCodes_link(codes1,codes2);
+		InterCodes_link(codes1,codes3);
+		InterCodes_link(codes1,codes4);
+		
+		return codes1;
 	}
 
 	//-------------------------------------------------Exp PLUS Exp
@@ -395,7 +440,29 @@ InterCodes translate_Exp(node* exp,Operand place){
 
 	//---------------------------------------------------NOT Exp
 	else if(exp->exp_type == 17){
+		Operand	label1 = new_label()
+		Operand label2 = new_label()
+		InterCodes codes1 = InterCodes_init();
+		codes1->code = new_interCode(0);
+		codes1->code->assign.left = place;
+		codes1->code->assign.right = new_operand(1,0);
+
+		InterCodes codes2 = translate_Cond(exp, label1, label2);
 		
+		InterCodes codes3 = InterCodes_init();
+		codes3->code = new_interCode(5);
+		codes3->code->onlyop.op = label1;
+
+		InterCodes codes4 = InterCodes_init();
+		codes4->code = new_interCode(0);
+		codes4->code->assign.left = place;
+		codes4->code->assign.right = new_operand(1,1);
+
+		InterCodes_link(codes1,codes2);
+		InterCodes_link(codes1,codes3);
+		InterCodes_link(codes1,codes4);
+		
+		return codes1;
 	}
 
 	//---------------------------------------------------ID LP Args RP
