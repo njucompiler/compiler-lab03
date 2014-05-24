@@ -522,7 +522,24 @@ InterCodes translate_Exp(node* exp,Operand place){
 
 	//---------------------------------------------------ID LP RP
 	else if(exp->exp_type == 19){
-		
+		if(strcmp(exp->child->name,"read")==0){
+			InterCodes codes = InterCodes_init();
+			codes->code = new_interCode(READ);
+			codes->code->onlyop.op = place;
+		}
+		else if(strcmp(exp->child->name,"read")==0){
+			InterCodes codes = InterCodes_init();
+			codes->code = new_interCode(READ);
+			codes->code->onlyop.op = place;
+
+		}
+		else{
+			InterCodes codes = InterCodes_init();
+			codes->code = new_interCode(CALL);
+			codes->code->assign.left = place;
+			codes->code->assign.right = new_operand_name(exp->child->name); 
+		}
+		return codes;
 	}
 
 	//--------------------------------------------------Exp LB Exp RB
@@ -693,7 +710,16 @@ InterCodes translate_Compst(node* CompSt){
 
 InterCodes translate_Stmt(node* Stmt){
 	if(strcmp(Stmt->child->name,"Exp") == 0){
-		return translate_Exp(Stmt->child,NULL);
+		InterCodes codes = translate_Exp(Stmt->child,NULL);
+		InterCodes temp = codes;
+		while(temp->next != NULL){
+			temp = temp->next;
+		}
+		temp = temp->prev;
+		temp->next->prev = NULL;
+		free(temp->next);
+		temp->next = NULL;
+		return codes;
 	}
 	else if(strcmp(Stmt->child->name,"CompSt") == 0){
 		return translate_Compst(Stmt->child);
