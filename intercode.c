@@ -724,6 +724,7 @@ InterCodes translate_Declist(node* declist){
 }
 
 InterCodes translate_Def(node* deflist){
+	assert(deflist == NULL);
 	if(deflist->child != NULL)
 		return translate_Declist(deflist->child->brother);
 	else
