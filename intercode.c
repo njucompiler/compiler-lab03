@@ -85,9 +85,9 @@ void printf_Operand(Operand p){
 	}
 }
 void printf_ASSIGN(InterCodes q){
-	InterCode p = q->code;printf("%d\n",p->kind);printf("kkkkk\n");
+	InterCode p = q->code;
 	printf_Operand(p->assign.left);
-	fputs(" := ",fp);printf("dddddd\n");
+	fputs(" := ",fp);
 	printf_Operand(p->assign.right);
 }
 void printf_ADD(InterCodes q){
@@ -612,7 +612,7 @@ InterCodes translate_Exp(node* exp,Operand place){
 	else if(exp->exp_type == 23){
 		InterCodes codes = InterCodes_init();
 		codes->code = new_interCode(0);
-		codes->code->assign.right = new_operand(1,exp->node_int);printf("doubi\n");printf("%d\n",place->kind);printf("%d\n",var_no);
+		codes->code->assign.right = new_operand(1,exp->node_int);
 		codes->code->assign.left = place;
 		return codes;
 	}
@@ -727,6 +727,7 @@ InterCodes translate_Declist(node* declist){
 }
 
 InterCodes translate_Def(node* deflist){
+	assert(deflist != NULL);
 	if(deflist->child != NULL)
 		return translate_Declist(deflist->child->brother);
 	else
@@ -746,6 +747,39 @@ InterCodes translate_Deflist(node* deflist){
 		return NULL;
 }
 
+InterCodes translate_Extdef(Node* ExtDef) {
+	InterCodes code1, code2;
+	//Specifier ExtDecList SEMI
+	if(strcmp(ExtDef->child->brother->node_value, "ExtDecList") == 0){
+		return translate_Extdeclist(ExtDef->child->brother);
+	}
+	//Specifier FunDec CompSt
+	else if(strcmp(ExtDef->child->brother->node_value, "FunDec") == 0){
+		code1 = translate_Fundec(ExtDef->child->brother);
+		code2 = translate_Compst(ExtDef->child->brother->brother);
+		InterCodes_link(code1, code2);
+		return code1;
+	}
+	//Specifier SEMI
+	else
+		return NULL;
+}
+
+InterCodes translate_Extdeclist(Node* Extdeclist) {
+	InterCodes code1, code2;
+	if(Extdeclist->child->brother == NULL){		//VarDec
+		return translate_Vardec(child);
+	}
+	else if(Extdeclist->child->brother != NULL && strcmp(Extdeclist->child->brother->node_value, "COMMA") == 0){		//VarDec COMMA ExtDecList
+		code1 = translate_Vardec(Extdeclist->child);
+		code2 = translate_Extdeclist(Extdeclist->child->brother->brother);
+		InterCodes_link(code1, code2);
+		return code1;
+	}
+	else
+		return NULL;
+}
+
 InterCodes translate_Compst(node* CompSt){
 	InterCodes codes1 = InterCodes_init();
 	InterCodes codes2 = InterCodes_init();
@@ -759,6 +793,7 @@ InterCodes translate_Stmt(node* Stmt){
 	if(strcmp(Stmt->child->name,"Exp") == 0){
 		Operand t = new_temp();
 		return translate_Exp(Stmt->child,t);
+
 	}
 	else if(strcmp(Stmt->child->name,"CompSt") == 0){
 		return translate_Compst(Stmt->child);

@@ -63,6 +63,8 @@ InterCodes translate_Struct(node *Exp,Operand place);
 InterCodes translate_Array(node *Exp,Operand place);
 InterCodes translate_VarDec(node* VarDec);
 InterCodes translate_Fundec(node* Fundec);
+InterCodes translate_Extdef(NodePtr node);
+InterCodes translate_Extdeclist(Node* p);
 InterCodes InterCodes_init();
 void InterCodes_link(InterCodes prev,InterCodes next);
 void head_init();
