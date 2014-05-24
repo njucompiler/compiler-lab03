@@ -751,7 +751,7 @@ InterCodes translate_Extdef(Node* ExtDef) {
 		return translate_Extdeclist(ExtDef->child->brother);
 	}
 	//Specifier FunDec CompSt
-	else if(strcmp(child->next_sibling->content.name, "FunDec") == 0){
+	else if(strcmp(ExtDef->child->brother->node_value, "FunDec") == 0){
 		code1 = translate_Fundec(ExtDef->child->brother);
 		code2 = translate_Compst(ExtDef->child->brother->brother);
 		InterCodes_link(code1, code2);
