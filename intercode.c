@@ -216,11 +216,14 @@ void show_all(char* output){
 				break;
 			case FUNC_I:
 				printf_Operand(p->code->onlyop.op);
-			case DEC:
+			case READ:
 				printf_READ(p);
 				break;
-			case DEC:
+			case WRITE:
 				printf_WRITE(p);
+				break;
+			case ARG:
+				printf_ARG(p);
 				break;
 			default:
 				break;
