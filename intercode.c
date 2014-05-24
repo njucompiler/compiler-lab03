@@ -257,8 +257,8 @@ InterCodes translate_Exp(node* exp,Operand place){
 	}
 	//-------------------------------------------------Exp AND Exp
 	else if(exp->exp_type == 8){
-		Operand	label1 = new_label()
-		Operand label2 = new_label()
+		Operand	label1 = new_label();
+		Operand label2 = new_label();
 		InterCodes codes1 = InterCodes_init();
 		codes1->code = new_interCode(0);
 		codes1->code->assign.left = place;
@@ -284,8 +284,8 @@ InterCodes translate_Exp(node* exp,Operand place){
 
 	//-------------------------------------------------Exp OR Exp
 	else if(exp->exp_type == 9){
-		Operand	label1 = new_label()
-		Operand label2 = new_label()
+		Operand	label1 = new_label();
+		Operand label2 = new_label();
 		InterCodes codes1 = InterCodes_init();
 		codes1->code = new_interCode(0);
 		codes1->code->assign.left = place;
@@ -311,8 +311,8 @@ InterCodes translate_Exp(node* exp,Operand place){
 
 	//-------------------------------------------------Exp RELOP Exp
 	else if(exp->exp_type == 10){
-		Operand	label1 = new_label()
-		Operand label2 = new_label()
+		Operand	label1 = new_label();
+		Operand label2 = new_label();
 		InterCodes codes1 = InterCodes_init();
 		codes1->code = new_interCode(0);
 		codes1->code->assign.left = place;
@@ -440,8 +440,8 @@ InterCodes translate_Exp(node* exp,Operand place){
 
 	//---------------------------------------------------NOT Exp
 	else if(exp->exp_type == 17){
-		Operand	label1 = new_label()
-		Operand label2 = new_label()
+		Operand	label1 = new_label();
+		Operand label2 = new_label();
 		InterCodes codes1 = InterCodes_init();
 		codes1->code = new_interCode(0);
 		codes1->code->assign.left = place;
