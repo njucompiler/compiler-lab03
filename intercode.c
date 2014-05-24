@@ -539,7 +539,7 @@ InterCodes translate_Exp(node* exp,Operand place){
 	//---------------------------------------------------ID LP Args RP
 	else if(exp->exp_type == 18){
 		Operand* arg_list = (Operand*)malloc(sizeof(Operand)*8);
-		int arg_num;
+		int arg_num = 0;
 		InterCodes codes1 = translate_Args(exp->child->brother->brother,arg_list,&arg_num);
 		if (strcmp(exp->child->name,"write")==0){
 			InterCodes codes2 = InterCodes_init();
@@ -672,8 +672,8 @@ InterCodes translate_Cond(node* exp,Operand true_place,Operand false_place){
 		codes3->code = new_interCode(LAB);
 		codes3->code->onlyop.op = label1;
 		
-		InterCodes_link(codes1,codes3);
 		InterCodes_link(codes1,codes2);
+		InterCodes_link(codes1,codes3);
 		return codes1;
 	}
 	else{
@@ -1071,12 +1071,12 @@ void intercode_aly(node *p){
 			intercode_aly(p->brother);
 		return;
 	}
-	else if(strcmp(name,"CompSt")==0){
+	else if(strcmp(name,"CompSt")==0){/*
 		InterCodes codes =	translate_Compst(p);
 		add_to_head(codes);
 		if(p->brother != NULL)
 			intercode_aly(p->brother);
-		return;
+		return;*/
 	}
 	else if(strcmp(name,"Stmt")==0){
 		InterCodes codes = translate_Stmt(p);
