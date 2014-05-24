@@ -85,9 +85,9 @@ void printf_Operand(Operand p){
 	}
 }
 void printf_ASSIGN(InterCodes q){
-	InterCode p = q->code;
+	InterCode p = q->code;printf("%d\n",p->kind);printf("kkkkk\n");
 	printf_Operand(p->assign.left);
-	fputs(" := ",fp);
+	fputs(" := ",fp);printf("dddddd\n");
 	printf_Operand(p->assign.right);
 }
 void printf_ADD(InterCodes q){
@@ -164,6 +164,16 @@ void printf_COND(InterCodes q){
 	printf_Operand(p->cond.op2);
 	fputs(" ",fp);
 }
+void printf_READ(InterCodes q){
+	InterCode p = q->code;
+	fputs("READ ",fp);
+	printf_Operand(p->onlyop.op);
+}
+void printf_WRITE(InterCodes q){
+	InterCode p = q->code;
+	fputs("WRITE ",fp);
+	printf_Operand(p->onlyop.op);
+}
 void show_all(char* output){
 	fp = fopen(output,"w");
 	if ( !fp )
@@ -171,10 +181,10 @@ void show_all(char* output){
 		perror(output);
 		return ;
 	}
-	InterCodes p = intercodes_head->next;
-	while(p!=NULL){
+	InterCodes p = intercodes_head->next;int i = 0;
+	while(p!=NULL){i++;
 		switch(p->code->kind){
-			case ASSIGN:
+			case ASSIGN:printf("11111\n");
 				printf_ASSIGN(p);
 				break;
 			case ADD:
@@ -206,6 +216,12 @@ void show_all(char* output){
 				break;
 			case FUNC_I:
 				printf_Operand(p->code->onlyop.op);
+			case DEC:
+				printf_READ(p);
+				break;
+			case DEC:
+				printf_WRITE(p);
+				break;
 			default:
 				break;
 
@@ -548,7 +564,7 @@ InterCodes translate_Exp(node* exp,Operand place){
 	else if(exp->exp_type == 23){
 		InterCodes codes = InterCodes_init();
 		codes->code = new_interCode(0);
-		codes->code->assign.right = new_operand(1,exp->node_int);
+		codes->code->assign.right = new_operand(1,exp->node_int);printf("doubi\n");printf("%d\n",place->kind);printf("%d\n",var_no);
 		codes->code->assign.left = place;
 		return codes;
 	}
