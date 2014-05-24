@@ -5,15 +5,15 @@ extern FILE* yyin;
 int main(int argc, char** argv)
 {
 	if ( argc <= 1 ) return 1;
-	printf("%s %s\n",argv[1],argv[2] );
-	FILE* fr = fopen(argv[1], "r");
+	printf("%s %s\n",argv[2],argv[3] );
+	FILE* fr = fopen(argv[2], "r");
 	if ( !fr )
 	{
-		perror(argv[1]);
+		perror(argv[2]);
 		return 1;
 	}
 	yyrestart(fr);
 	yyparse();
-	show_all(argv[2]);
+	show_all(argv[3]);
 	return 0;
 }

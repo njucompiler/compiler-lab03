@@ -1,5 +1,6 @@
 
 #include "node.h"
+#include <assert.h>
 #include "intercode.h"
 #include <stdarg.h>
 #include <string.h>
@@ -20,6 +21,10 @@ InterCodes InterCodes_init(){
 
 void InterCodes_link(InterCodes prev,InterCodes next){
 	InterCodes temp = prev;
+	if(temp == NULL){
+		printf("InterCodes_link error prev is NULL\n");
+		return;
+	}
 	while(temp->next != NULL){
 		temp = temp->next;
 	}
@@ -29,6 +34,10 @@ void InterCodes_link(InterCodes prev,InterCodes next){
 
 void add_to_head(InterCodes codes){
 	InterCodes temp = intercodes_head;
+	if(temp == NULL){
+		printf("InterCodes_link error prev is NULL\n");
+		return;
+	}
 	while(temp->next != NULL){
 		temp = temp->next;
 	}
@@ -42,6 +51,7 @@ void head_init(){
 }
 
 void printf_Operand(Operand p){
+	assert(p != NULL);
 	switch(p->kind){
 		case VARIABLE:
 			fprintf(fp,"%s",p->name);
@@ -56,7 +66,7 @@ void printf_Operand(Operand p){
 			fprintf(fp,"t%d",p->var_no);
 			break;
 		case LABEL:
-			fprintf(fp,"label%d:",p->label_no);
+			fprintf(fp,"label%d",p->label_no);
 			break;
 		case FUNC_op:
 			fprintf(fp,"%s",p->func);
@@ -66,6 +76,11 @@ void printf_Operand(Operand p){
 			break;
 		case ADDR_op:
 			fprintf(fp,"*%s",p->name);
+			break;
+		case op:
+			fprintf(fp,"%s",p->op);
+			break;
+		default:
 			break;
 	}
 }
@@ -111,6 +126,7 @@ void printf_LABEL(InterCodes q){
 	InterCode p = q->code;
 	fputs("LABEL ",fp);
 	printf_Operand(p->onlyop.op);
+	fputs(":",fp);
 }
 void printf_GOTO(InterCodes q){
 	InterCode p = q->code;
@@ -144,8 +160,9 @@ void printf_COND(InterCodes q){
 	InterCode p = q->code;
 	fputs("IF ",fp);
 	printf_Operand(p->cond.op1);
-	fputs(p->cond.op->op,fp);
+	fprintf(fp," %s ",p->cond.op->op );
 	printf_Operand(p->cond.op2);
+	fputs(" ",fp);
 }
 void show_all(char* output){
 	fp = fopen(output,"w");
@@ -181,10 +198,15 @@ void show_all(char* output){
 			case RET:
 				printf_RETURN(p);
 				break;
-			
+			case COND:
+				printf_COND(p);
+				break;
+			default:
+				break;
 		}
+		if(p->code->kind!=COND)
+			fputs("\n",fp);
 		p=p->next;
-		fputs("\n",fp);
 	}
 	fclose(fp);
 }
@@ -208,6 +230,8 @@ Operand new_operand(int kind,int value){//init a new operand
 	op->is_min = 0;
 	if(kind == 1)//constant
 		op->value = value;
+	else if(kind == 8)
+		;
 	else 
 		op->label_no = value;
 	return op;
@@ -275,9 +299,14 @@ InterCodes translate_Exp(node* exp,Operand place){
 		codes4->code->assign.left = place;
 		codes4->code->assign.right = new_operand(1,1);
 
+		InterCodes codes5 = InterCodes_init();
+		codes5->code = new_interCode(LAB);
+		codes5->code->onlyop.op = label2; 
+
 		InterCodes_link(codes1,codes2);
 		InterCodes_link(codes1,codes3);
 		InterCodes_link(codes1,codes4);
+		InterCodes_link(codes1,codes5);
 		
 		return codes1;
 	}
@@ -302,9 +331,14 @@ InterCodes translate_Exp(node* exp,Operand place){
 		codes4->code->assign.left = place;
 		codes4->code->assign.right = new_operand(1,1);
 
+		InterCodes codes5 = InterCodes_init();
+		codes5->code = new_interCode(LAB);
+		codes5->code->onlyop.op = label2; 
+
 		InterCodes_link(codes1,codes2);
 		InterCodes_link(codes1,codes3);
 		InterCodes_link(codes1,codes4);
+		InterCodes_link(codes1,codes5);
 		
 		return codes1;
 	}
@@ -329,9 +363,14 @@ InterCodes translate_Exp(node* exp,Operand place){
 		codes4->code->assign.left = place;
 		codes4->code->assign.right = new_operand(1,1);
 
+		InterCodes codes5 = InterCodes_init();
+		codes5->code = new_interCode(LAB);
+		codes5->code->onlyop.op = label2; 
+
 		InterCodes_link(codes1,codes2);
 		InterCodes_link(codes1,codes3);
 		InterCodes_link(codes1,codes4);
+		InterCodes_link(codes1,codes5);
 		
 		return codes1;
 	}
@@ -458,9 +497,14 @@ InterCodes translate_Exp(node* exp,Operand place){
 		codes4->code->assign.left = place;
 		codes4->code->assign.right = new_operand(1,1);
 
+		InterCodes codes5 = InterCodes_init();
+		codes5->code = new_interCode(LAB);
+		codes5->code->onlyop.op = label2; 
+
 		InterCodes_link(codes1,codes2);
 		InterCodes_link(codes1,codes3);
 		InterCodes_link(codes1,codes4);
+		InterCodes_link(codes1,codes5);
 		
 		return codes1;
 	}
@@ -487,11 +531,11 @@ InterCodes translate_Exp(node* exp,Operand place){
 
 	//---------------------------------------------------ID
 	else if(exp->exp_type == 22){
-		/*????
-		InterCode code = new_interCode(0);
-		code.assign.left = new_operand(0,var_no);
-		code.assign.right = new_operand_name(exp->node_value);
-		return code;*/
+		InterCodes codes = InterCodes_init();
+		codes->code = new_interCode(0);
+		codes->code->assign.right = new_operand_name(exp->node_value);
+		codes->code->assign.left = place;
+		return codes;
 	}
 
 	//--------------------------------------------------INT
@@ -522,8 +566,10 @@ InterCodes translate_Cond(node* exp,Operand true_place,Operand false_place){
 		InterCodes codes3 = InterCodes_init();
 		codes3->code = new_interCode(COND);
 		codes3->code->cond.op1 = t1;
-		codes3->code->cond.op1 = t2;
+		codes3->code->cond.op2 = t2;
+		codes3->code->cond.op = new_operand(op,0);
 		strcpy(codes3->code->cond.op->op,exp->child->brother->node_value);
+		printf("op:%s\n", codes3->code->cond.op->op);
 		InterCodes codes4 = InterCodes_init();
 		codes4->code = new_interCode(GOTO);
 		codes4->code->onlyop.op = true_place;
@@ -640,17 +686,116 @@ InterCodes translate_Compst(node* CompSt){
 }
 
 InterCodes translate_Stmt(node* Stmt){
-	if(strcmp(Stmt->child->node_value,"Exp") == 0){
+	if(strcmp(Stmt->child->name,"Exp") == 0){
 		return translate_Exp(Stmt->child,NULL);
 	}
-	else if(strcmp(Stmt->child->node_value,"CompSt") == 0){
+	else if(strcmp(Stmt->child->name,"CompSt") == 0){
 		return translate_Compst(Stmt->child);
 	}
-	else if(strcmp(Stmt->child->node_value,"RETURN") == 0){
+	else if(strcmp(Stmt->child->name,"RETURN") == 0){
+		Operand t1 = new_temp();
+		InterCodes codes1 =  translate_Exp(Stmt->child->brother,t1);
+		
+		InterCodes codes2 = InterCodes_init();
+		codes2->code = new_interCode(RET);
+		codes2->code->onlyop.op = t1;
+		
+		InterCodes_link(codes1,codes2);
+		return codes1;
+	}
+	else if(strcmp(Stmt->child->name,"WHILE") == 0){
+		Operand label1 = new_label();
+		Operand label2 = new_label();
+		Operand label3 = new_label();
+
+		InterCodes codes1 = InterCodes_init();
+		codes1->code = new_interCode(LAB);
+		codes1->code->onlyop.op = label1;
+
+		InterCodes codes2 = translate_Cond(Stmt->child->brother->brother, label2, label3);
+		
+		InterCodes codes3 = InterCodes_init();
+		codes3->code = new_interCode(LAB);
+		codes3->code->onlyop.op = label2;
+
+		InterCodes codes4 = translate_Stmt(Stmt->child->brother->brother->brother->brother);
+
+		InterCodes codes5 = InterCodes_init();
+		codes5->code = new_interCode(GOTO);
+		codes5->code->onlyop.op = label1;
+
+		InterCodes codes6 = InterCodes_init();
+		codes6->code = new_interCode(LAB);
+		codes6->code->onlyop.op = label3;
+
+		InterCodes_link(codes1,codes2);
+		InterCodes_link(codes1,codes3);
+		InterCodes_link(codes1,codes4);
+		InterCodes_link(codes1,codes5);
+		InterCodes_link(codes1,codes6);
+
+		return codes1;
 
 	}
-	else if(strcmp(Stmt->child->node_value,"WHILE") == 0){
+	//IF LP Exp RP Stmt1 
+	else if(Stmt->child->brother->brother->brother->brother->brother == NULL){
+		Operand label1 = new_label();
+		Operand label2 = new_label();
+		
+		InterCodes codes1 = translate_Cond(Stmt->child->brother->brother, label1, label2);
+		
+		InterCodes codes2 = InterCodes_init();
+		codes2->code = new_interCode(LAB);
+		codes2->code->onlyop.op = label1;
 
+		InterCodes codes3 = translate_Stmt(Stmt->child->brother->brother->brother->brother);
+
+		InterCodes codes4 = InterCodes_init();
+		codes4->code = new_interCode(LAB);
+		codes4->code->onlyop.op = label2;
+
+		InterCodes_link(codes1,codes2);
+		InterCodes_link(codes1,codes3);
+		InterCodes_link(codes1,codes4);
+
+		return codes1;
+	}
+	//IF LP Exp RP Stmt1 ELSE Stmt2 
+	else{
+		Operand	label1 = new_label();
+	 	Operand	label2 = new_label();
+		Operand label3 = new_label();
+
+		InterCodes codes1 = translate_Cond(Stmt->child->brother->brother, label1, label2);
+
+		InterCodes codes2 = InterCodes_init();
+		codes2->code = new_interCode(LAB);
+		codes2->code->onlyop.op = label1;
+
+		InterCodes codes3 = translate_Stmt(Stmt->child->brother->brother->brother->brother);
+
+		InterCodes codes4 = InterCodes_init();
+		codes4->code = new_interCode(GOTO);
+		codes4->code->onlyop.op = label3;
+
+		InterCodes codes5 = InterCodes_init();
+		codes5->code = new_interCode(LAB);
+		codes5->code->onlyop.op = label2;
+
+		InterCodes codes6 = translate_Stmt(Stmt->child->brother->brother->brother->brother->brother->brother);
+
+		InterCodes codes7 = InterCodes_init();
+		codes7->code = new_interCode(LAB);
+		codes7->code->onlyop.op = label3;
+
+		InterCodes_link(codes1,codes2);
+		InterCodes_link(codes1,codes3);
+		InterCodes_link(codes1,codes4);
+		InterCodes_link(codes1,codes5);
+		InterCodes_link(codes1,codes6);
+		InterCodes_link(codes1,codes7);
+
+		return codes1;
 	}
 	//else if(Stmt->child->brother-)
 } 
@@ -809,7 +954,6 @@ void intercode_aly(node *p){
 		add_to_head(expe);
 		if(p->brother != NULL)
 			intercode_aly(p->brother);
-		printf("exp\n");
 		return;
 	}
 	else if(strcmp(name,"CompSt")==0){
@@ -819,7 +963,11 @@ void intercode_aly(node *p){
 
 	}
 	else if(strcmp(name,"Stmt")==0){
-
+		InterCodes codes = translate_Stmt(p);
+		add_to_head(codes);
+		if(p->brother != NULL)
+			intercode_aly(p->brother);
+		return;
 	}
 
 	if(p->child != NULL)
@@ -843,6 +991,10 @@ Operand get_left(InterCodes codes){
 
 void optimize(){
 	InterCodes temp = intercodes_head->next;
+	if(temp == NULL){
+		printf("error at optimize\n");
+		return;
+	}
 	while(temp->next != NULL){
 		if((temp->code->kind == 0 || temp->code->kind == 1 || temp->code->kind == 2 || temp->code->kind == 3 || temp->code->kind == 4)&& (temp->next->code->kind == 0)){
 			Operand left = get_left(temp);
@@ -867,8 +1019,7 @@ void optimize(){
 void printfile(node* p){
 	head_init();
 	intercode_aly(p);
-	optimize();
-	printf("over\n");
+	//optimize();
 }
 
 int getSize(Type p){
