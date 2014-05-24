@@ -410,13 +410,12 @@ InterCodes translate_Cond(node* exp,Operand true_place,Operand false_place){
 		codes3->code = new_interCode(COND);
 		codes3->code->cond.op1 = t1;
 		codes3->code->cond.op1 = t2;
-		strcpy(codes3->code->cond.op,exp->child->brother->node_value);
-		
+		strcpy(codes3->code->cond.op->op,exp->child->brother->node_value);
 		InterCodes codes4 = InterCodes_init();
 		codes4->code = new_interCode(GOTO);
 		codes4->code->onlyop.op = true_place;
 
-		InterCodes codes5 = InterCodes_init()
+		InterCodes codes5 = InterCodes_init();
 		codes5->code = new_interCode(GOTO);
 		codes5->code->onlyop.op = false_place;
 
@@ -431,7 +430,8 @@ InterCodes translate_Cond(node* exp,Operand true_place,Operand false_place){
 		Operand label1 = new_label();
 		InterCodes codes1 = translate_Cond(exp->child, label1, false_place);
 		InterCodes codes2 = translate_Cond(exp->child->brother->brother, true_place, false_place);
-		InterCodes codes3 = InterCodes_init(LAB);
+		InterCodes codes3 = InterCodes_init();
+		codes3->code = new_interCode(LAB);
 		codes3->code->onlyop.op = label1;
 		
 		InterCodes_link(codes1,codes3);
@@ -442,7 +442,8 @@ InterCodes translate_Cond(node* exp,Operand true_place,Operand false_place){
 		Operand label1 = new_label();
 		InterCodes codes1 = translate_Cond(exp->child, true_place, label1);
 		InterCodes codes2 = translate_Cond(exp->child->brother->brother, true_place, false_place);
-		InterCodes codes3 = InterCodes_init(LAB);
+		InterCodes codes3 = InterCodes_init();
+		codes3->code = new_interCode(LAB);
 		codes3->code->onlyop.op = label1;
 		
 		InterCodes_link(codes1,codes3);

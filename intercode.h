@@ -31,7 +31,7 @@ typedef struct InterCode_
 		struct { Operand right, left; } assign;
 		struct { Operand result, op1, op2; } binop;
 		struct { Operand op; }onlyop;
-		struct {Operand op1, op, op2}cond;
+		struct { Operand op1, op, op2; }cond;
 		};
 }InterCode_;
 
