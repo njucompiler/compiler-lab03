@@ -184,7 +184,7 @@ void show_all(char* output){
 	InterCodes p = intercodes_head->next;int i = 0;
 	while(p!=NULL){i++;
 		switch(p->code->kind){
-			case ASSIGN:printf("11111\n");
+			case ASSIGN:
 				printf_ASSIGN(p);
 				break;
 			case ADD:
@@ -541,7 +541,7 @@ InterCodes translate_Exp(node* exp,Operand place){
 		Operand* arg_list = (Operand*)malloc(sizeof(Operand)*8);
 		int arg_num = 0;
 		InterCodes codes1 = translate_Args(exp->child->brother->brother,arg_list,&arg_num);
-		if (strcmp(exp->child->name,"write")==0){
+		if (strcmp(exp->child->node_value,"write")==0){
 			InterCodes codes2 = InterCodes_init();
 			codes2->code = new_interCode(WRITE);
 			codes2->code->onlyop.op = arg_list[0];
@@ -568,7 +568,7 @@ InterCodes translate_Exp(node* exp,Operand place){
 	//---------------------------------------------------ID LP RP
 	else if(exp->exp_type == 19){
 		InterCodes codes = InterCodes_init();
-		if(strcmp(exp->child->name,"read")==0){
+		if(strcmp(exp->child->node_value,"read")==0){
 			codes->code = new_interCode(READ);
 			codes->code->onlyop.op = place;
 		}
