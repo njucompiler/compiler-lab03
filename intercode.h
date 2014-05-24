@@ -20,13 +20,13 @@ typedef struct Operand_ {
 	int var_no;
 	int value;
 	int label_no;
-	char *func;
-	char *param;
+	char func[20];
+	char param[20];
 	} ;
 }Operand_;
 typedef struct InterCode_
 {
-	enum { ASSIGN, ADD, SUB, MUL, DIVI, LAB, GOTO, RET, ADDR, COND} kind;
+	enum { ASSIGN, ADD, SUB, MUL, DIVI, LAB, GOTO, RET, ADDR, COND,FUNC,DEC} kind;
 	union {
 		struct { Operand right, left; } assign;
 		struct { Operand result, op1, op2; } binop;
@@ -61,6 +61,8 @@ InterCodes translate_Declist(node* declist);
 InterCodes translate_Args(node* Args,Operand *arg,int num);
 InterCodes translate_Struct(node *Exp,Operand place);
 InterCodes translate_Array(node *Exp,Operand place);
+InterCodes translate_VarDec(node* VarDec);
+InterCodes translate_Fundec(node* Fundec);
 InterCodes InterCodes_init();
 void InterCodes_link(InterCodes prev,InterCodes next);
 void head_init();

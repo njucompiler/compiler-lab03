@@ -201,8 +201,12 @@ void show_all(char* output){
 			case COND:
 				printf_COND(p);
 				break;
+			case DEC:
+				printf_DEC(p);
+				break;
 			default:
 				break;
+
 		}
 		if(p->code->kind!=COND)
 			fputs("\n",fp);
@@ -811,6 +815,47 @@ InterCodes translate_Stmtlist(node* Stmtlist){
 	}
 	else
 		return NULL;
+}
+InterCodes translate_VarDec(node* VarDec){
+	InterCodes code1 = InterCodes_init();
+	if(strcmp(VarDec->child->name, "ID") == 0){			//ID
+		FieldList p = Findname(VarDec->child->node_value);
+		if(p->type->kind == Int || p->type->kind == Float){
+			return NULL;
+		}
+		else if(p->type->kind == ARRAY || p->type->kind == STRUCTURE){
+			int size = getSize(p->type);
+			code1->code->assign.left->kind = VARIABLE;
+			strcpy(code1->code->assign.left->name,VarDec->child->node_value);
+			Operand temp = new_operand(1,size);
+			code1->code->assign.right = temp;
+			code1->code->kind = DEC;
+		}
+		return code1;
+	}
+	else								//ID LB INT RB
+		translate_VarDec(VarDec->child,NULL);
+}
+InterCodes translate_Fundec(node* Fundec){
+	node* ID = Fundec->child;
+	InterCodes code1 = InterCodes_init();
+	code1->code->kind = FUNC;
+	code1->code->onlyop.op->kind = FUNC_op;
+	strcpy(code1->code->onlyop.op->func,ID->node_value);
+	if(strcmp(ID->brother->brother->name,"VarList") == 0){			//ID LP VarList RP
+		FieldList p = Findname(ID->node_value);	
+		FuncVar *q = p->func->brother;
+		while(q != NULL){
+			InterCodes code2 = InterCodes_init();
+			code2->code->onlyop.op->kind = PARAM_op;
+			strcpy(code1->code->onlyop.op->func,q->name);	
+			code1 = InterCodes_link(code1, code2);
+			param = param->tail;
+		}
+		return code1;
+	}
+	else 			//ID LP RP
+		return code1;
 }
 InterCodes translate_Args(node* Args,Operand *arg,int num){
 	if(Args->child->brother == NULL){

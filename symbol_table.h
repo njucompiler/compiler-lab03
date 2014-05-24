@@ -393,6 +393,10 @@ void FUNC_Insert(node *ExtDef){
 			temp->next =NULL;
 			SymbolTable[i]->type->func.brother = temp;
 			node *Spec = VarList->child->child;
+			if(strcmp(Spec->brother->child->name,"ID") == 0)
+				strcpy(temp->name,Spec->brother->child->node_value);
+			else
+				strcpy(temp->name,Spec->brother->child->child->node_value);
 			if(strcmp(Spec->child->node_value,"int")==0){
 				strcpy(temp->kind,"INT");
 				INT_Insert(Spec->brother->child->node_value,0);
@@ -416,6 +420,10 @@ void FUNC_Insert(node *ExtDef){
 				temp->next = tem;
 				temp = temp->next;
 				Spec = VarList->child->child;
+			if(strcmp(Spec->brother->child->name,"ID") == 0)
+				strcpy(temp->name,Spec->brother->child->node_value);
+			else
+				strcpy(temp->name,Spec->brother->child->child->node_value);
 				if(strcmp(Spec->child->node_value,"int")==0)
 					strcpy(temp->kind,"INT");
 				else if(strcmp(Spec->child->node_value,"float")==0){
@@ -462,6 +470,10 @@ void FUNC_Insert(node *ExtDef){
 			temp->next =NULL;
 			p->type->func.brother = temp;
 			node *Spec = VarList->child->child;
+			if(strcmp(Spec->brother->child->name,"ID") == 0)
+				strcpy(temp->name,Spec->brother->child->node_value);
+			else
+				strcpy(temp->name,Spec->brother->child->child->node_value);
 			if(strcmp(Spec->child->node_value,"int")==0){
 				strcpy(temp->kind,"INT");
 				INT_Insert(Spec->brother->child->node_value,0);
@@ -485,6 +497,10 @@ void FUNC_Insert(node *ExtDef){
 				temp->next = tem;
 				temp = temp->next;
 				Spec = VarList->child->child;
+			if(strcmp(Spec->brother->child->name,"ID") == 0)
+				strcpy(temp->name,Spec->brother->child->node_value);
+			else
+				strcpy(temp->name,Spec->brother->child->child->node_value);
 				if(strcmp(Spec->child->node_value,"int")==0){
 					strcpy(temp->kind,"INT");
 					INT_Insert(Spec->brother->child->node_value,0);

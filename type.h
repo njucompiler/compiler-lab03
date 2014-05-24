@@ -6,7 +6,7 @@ typedef struct FieldList_* FieldList;
 
 
 typedef struct TFuncVar{
-
+	 char name[20];
 	 struct TFuncVar* next;
 	 char kind[20];
 }FuncVar;
