@@ -609,7 +609,7 @@ InterCodes translate_Exp(node* exp,Operand place){
 	else if(exp->exp_type == 23){
 		InterCodes codes = InterCodes_init();
 		codes->code = new_interCode(0);
-		codes->code->assign.right = new_operand(1,exp->node_int);printf("doubi\n");printf("%d\n",place->kind);printf("%d\n",var_no);
+		codes->code->assign.right = new_operand(1,exp->node_int);
 		codes->code->assign.left = place;
 		return codes;
 	}
@@ -724,7 +724,7 @@ InterCodes translate_Declist(node* declist){
 }
 
 InterCodes translate_Def(node* deflist){
-	assert(deflist == NULL);
+	assert(deflist != NULL);
 	if(deflist->child != NULL)
 		return translate_Declist(deflist->child->brother);
 	else
@@ -757,11 +757,10 @@ InterCodes translate_Stmt(node* Stmt){
 	if(strcmp(Stmt->child->name,"Exp") == 0){
 		InterCodes codes = translate_Exp(Stmt->child,NULL);
 		InterCodes temp = codes;
-		while(temp->next != NULL){
+		while(temp->next != NULL){printf("aaaa\n");
 			temp = temp->next;
-		}
+		}assert(temp->code->assign.right!=NULL);assert(temp->prev!=NULL);
 		temp = temp->prev;
-		temp->next->prev = NULL;
 		free(temp->next);
 		temp->next = NULL;
 		return codes;
