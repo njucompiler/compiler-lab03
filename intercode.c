@@ -85,9 +85,9 @@ void printf_Operand(Operand p){
 	}
 }
 void printf_ASSIGN(InterCodes q){
-	InterCode p = q->code;printf("%d\n",p->kind);printf("kkkkk\n");
+	InterCode p = q->code;
 	printf_Operand(p->assign.left);
-	fputs(" := ",fp);printf("dddddd\n");
+	fputs(" := ",fp);
 	printf_Operand(p->assign.right);
 }
 void printf_ADD(InterCodes q){
@@ -744,6 +744,39 @@ InterCodes translate_Deflist(node* deflist){
 		return NULL;
 }
 
+InterCodes translate_Extdef(NodePtr node) {
+	InterCodes code1, code2;
+	//Specifier ExtDecList SEMI
+	if(strcmp(p->child->brother->node_value, "ExtDecList") == 0){
+		return translate_Extdeclist(p->child->brother);
+	}
+	//Specifier FunDec CompSt
+	else if(strcmp(child->next_sibling->content.name, "FunDec") == 0){
+		code1 = translate_Fundec(p->child->brother);
+		code2 = translate_Compst(p->child->brother->brother);
+		InterCodes_link(code1, code2);
+		return code1;
+	}
+	//Specifier SEMI
+	else
+		return NULL;
+}
+
+InterCodes translate_Extdeclist(Node* p) {
+	InterCodes code1, code2;
+	if(p->child->brother == NULL){		//VarDec
+		return translate_Vardec(child);
+	}
+	else if(child->next_sibling != NULL && strcmp(child->next_sibling->content.name, "COMMA") == 0){		//VarDec COMMA ExtDecList
+		code1 = translate_Vardec(child);
+		code2 = translate_Extdeclist(p->child->brother->brother);
+		InterCodes_link(code1, code2);
+		return code1;
+	}
+	else
+		return NULL;
+}
+
 InterCodes translate_Compst(node* CompSt){
 	InterCodes codes1 = InterCodes_init();
 	InterCodes codes2 = InterCodes_init();
@@ -757,9 +790,9 @@ InterCodes translate_Stmt(node* Stmt){
 	if(strcmp(Stmt->child->name,"Exp") == 0){
 		InterCodes codes = translate_Exp(Stmt->child,NULL);
 		InterCodes temp = codes;
-		while(temp->next != NULL){printf("aaaa\n");
+		while(temp->next != NULL){
 			temp = temp->next;
-		}assert(temp->code->assign.right!=NULL);assert(temp->prev!=NULL);
+		}
 		temp = temp->prev;
 		free(temp->next);
 		temp->next = NULL;
