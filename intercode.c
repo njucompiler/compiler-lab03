@@ -744,16 +744,16 @@ InterCodes translate_Deflist(node* deflist){
 		return NULL;
 }
 
-InterCodes translate_Extdef(NodePtr node) {
+InterCodes translate_Extdef(Node* ExtDef) {
 	InterCodes code1, code2;
 	//Specifier ExtDecList SEMI
-	if(strcmp(p->child->brother->node_value, "ExtDecList") == 0){
-		return translate_Extdeclist(p->child->brother);
+	if(strcmp(ExtDef->child->brother->node_value, "ExtDecList") == 0){
+		return translate_Extdeclist(ExtDef->child->brother);
 	}
 	//Specifier FunDec CompSt
 	else if(strcmp(child->next_sibling->content.name, "FunDec") == 0){
-		code1 = translate_Fundec(p->child->brother);
-		code2 = translate_Compst(p->child->brother->brother);
+		code1 = translate_Fundec(ExtDef->child->brother);
+		code2 = translate_Compst(ExtDef->child->brother->brother);
 		InterCodes_link(code1, code2);
 		return code1;
 	}
@@ -762,14 +762,14 @@ InterCodes translate_Extdef(NodePtr node) {
 		return NULL;
 }
 
-InterCodes translate_Extdeclist(Node* p) {
+InterCodes translate_Extdeclist(Node* Extdeclist) {
 	InterCodes code1, code2;
-	if(p->child->brother == NULL){		//VarDec
+	if(Extdeclist->child->brother == NULL){		//VarDec
 		return translate_Vardec(child);
 	}
-	else if(child->next_sibling != NULL && strcmp(child->next_sibling->content.name, "COMMA") == 0){		//VarDec COMMA ExtDecList
-		code1 = translate_Vardec(child);
-		code2 = translate_Extdeclist(p->child->brother->brother);
+	else if(Extdeclist->child->brother != NULL && strcmp(Extdeclist->child->brother->node_value, "COMMA") == 0){		//VarDec COMMA ExtDecList
+		code1 = translate_Vardec(Extdeclist->child);
+		code2 = translate_Extdeclist(Extdeclist->child->brother->brother);
 		InterCodes_link(code1, code2);
 		return code1;
 	}
