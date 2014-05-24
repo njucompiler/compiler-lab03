@@ -281,6 +281,8 @@ Operand new_temp(){
 	return op;
 }
 
+
+
 InterCodes translate_Exp(node* exp,Operand place){
 	//-------------------------------------------------Exp ASSIGNOP Exp
 	if(exp->exp_type == 7){
@@ -533,7 +535,30 @@ InterCodes translate_Exp(node* exp,Operand place){
 
 	//---------------------------------------------------ID LP Args RP
 	else if(exp->exp_type == 18){
-		
+		Operand* arg_list = (Operand*)malloc(sizeof(Operand)*8);
+		int arg_num;
+		InterCodes codes1 = translate_Args(Args,arg_list,&arg_num);
+		if (strcmp(exp->child->name,"write")==0){
+			InterCodes codes2 = InterCodes_init();
+			codes2->code = new_interCode(WRITE);
+			codes2->code->onlyop.op = arg_list[0];
+
+			InterCodes_link(codes1,codes2);
+			
+			return codes1;
+		}
+   		for(int i = 0;i < arg_num;i++){
+   			InterCodes codes2 = InterCodes_init();
+   			codes2->code = new_interCode(ARG);
+   			codes2->code->onlyop.op = arg_list[i];
+
+   			InterCodes_link(codes1,codes2);
+   		}
+   		InterCodes codes3 = InterCodes_init();
+   		codes3->code = new_interCode(CALL);
+   		codes3->code->assign.left = place;
+   		codes3->code->assign.right = new_operand_name(exp->child->name);
+  		return codes1;
 	}
 
 	//---------------------------------------------------ID LP RP
@@ -543,12 +568,12 @@ InterCodes translate_Exp(node* exp,Operand place){
 			codes->code = new_interCode(READ);
 			codes->code->onlyop.op = place;
 		}
-		else if(strcmp(exp->child->name,"read")==0){
+		/*else if(strcmp(exp->child->name,"write")==0){
 			InterCodes codes = InterCodes_init();
 			codes->code = new_interCode(READ);
 			codes->code->onlyop.op = place;
 
-		}
+		}*/
 		else{
 			InterCodes codes = InterCodes_init();
 			codes->code = new_interCode(CALL);
@@ -901,7 +926,7 @@ InterCodes translate_Fundec(node* Fundec){
 	else 			//ID LP RP
 		return code1;
 }
-InterCodes translate_Args(node* Args,Operand *arg,int num){
+InterCodes translate_Args(node* Args,Operand *arg,int* num){
 	if(Args->child->brother == NULL){
 		InterCodes code1;
 		Operand op = new_temp();
