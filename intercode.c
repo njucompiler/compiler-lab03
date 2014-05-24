@@ -1003,7 +1003,7 @@ InterCodes translate_Struct(node *Exp,Operand place){
 		}	
 		Operand op1 = new_operand_name(ID1->child->node_value);
 		Operand op2 = new_operand(1,size);
-		code1->code->kind = ADDR;
+		code1->code = new_interCode(ADDR);
 		code1->code->binop.result = place;
 		code1->code->binop.op1 = op1;
 		code1->code->binop.op2 = op2;
@@ -1025,7 +1025,7 @@ InterCodes translate_Struct(node *Exp,Operand place){
 		}
 		Operand op1 = new_operand_name(ID1->child->node_value);
 		Operand op2 = new_operand(1,size);
-		code2->code->kind = ADDR;
+		code1->code = new_interCode(ADDR);
 		code2->code->binop.result = place;
 		code2->code->binop.op1 = op1;
 		code2->code->binop.op2 = op2;
@@ -1035,7 +1035,7 @@ InterCodes translate_Struct(node *Exp,Operand place){
 	}
 }
 InterCodes translate_Array(node *Exp,Operand place){
-	InterCodes code1 = InterCodes_init();			
+	InterCodes code1 = NULL;			
 	FieldList p = Findname(Exp->child->child->node_value);
 	int size =0;
 	//Operand t ;
@@ -1049,11 +1049,13 @@ InterCodes translate_Array(node *Exp,Operand place){
 		code2 = translate_Exp(Exp->child->brother->brother,t1);			//翻译[]中的exp
 		Operand t2 = new_temp();
 		Operand c1 = new_operand(1,size);
-		code3->code->kind = MUL;
+		code3 = InterCodes_init();
+		code3->code = new_interCode(MUL);
 		code3->code->binop.result = t2;
 		code3->code->binop.op1 = t1;
 		code3->code->binop.op2 = c1;
-		code4->code->kind = ADDR;
+		code4 = InterCodes_init();
+		code4->code = new_interCode(ADDR);
 		code4->code->binop.result = place;
 		code4->code->binop.op1 = op1;
 		code4->code->binop.op2 = t2;
@@ -1077,11 +1079,13 @@ InterCodes translate_Array(node *Exp,Operand place){
 		code2 = translate_Exp(Exp->child->brother->brother,t1);			//翻译[]中的exp
 		Operand t2 = new_temp();
 		Operand c1 = new_operand(1,size);
-		code3->code->kind = MUL;
+		code3 = InterCodes_init();
+		code3->code = new_interCode(MUL);
 		code3->code->binop.result = t2;
 		code3->code->binop.op1 = t1;
 		code3->code->binop.op2 = c1;
-		code4->code->kind = ADDR;
+		code4 = InterCodes_init();
+		code4->code = new_interCode(ADDR);
 		code4->code->binop.result = place;
 		code4->code->binop.op1 = op1;
 		code4->code->binop.op2 = t2;
