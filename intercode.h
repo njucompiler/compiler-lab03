@@ -20,13 +20,13 @@ typedef struct Operand_ {
 	int var_no;
 	int value;
 	int label_no;
-	char *func;
-	char *param;
+	char func[20];
+	char param[20];
 	} ;
 }Operand_;
 typedef struct InterCode_
 {
-	enum { ASSIGN, ADD, SUB, MUL, DIVI, LAB, GOTO, RET, ADDR, COND} kind;
+	enum { ASSIGN, ADD, SUB, MUL, DIVI, LAB, GOTO, RET, ADDR, COND,FUNC} kind;
 	union {
 		struct { Operand right, left; } assign;
 		struct { Operand result, op1, op2; } binop;

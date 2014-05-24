@@ -181,10 +181,14 @@ void show_all(char* output){
 			case RET:
 				printf_RETURN(p);
 				break;
-			
+			case COND:
+				printf_COND(p);
+				break;
+				
 		}
 		p=p->next;
-		fputs("\n",fp);
+		if(p->code->kind != COND)
+			fputs("\n",fp);
 	}
 	fclose(fp);
 }
@@ -666,6 +670,27 @@ InterCodes translate_Stmtlist(node* Stmtlist){
 	}
 	else
 		return NULL;
+}
+InterCodes translate_Fundec(node* Fundec){
+	node* ID = Fundec->child;
+	InterCodes code1 = InterCodes_init();
+	code1->kind = FUNC;
+	code1->onlyop.op->kind = FUNC_op;
+	strcpy(code1->onlyop.op->func,ID->node_value);
+	if(strcmp(ID->brother->brother->name,"VarList") == 0){			//ID LP VarList RP
+		FieldList p = Findname(ID->node_value);	
+		FuncVar *q = p->func->brother;
+		while(q != NULL){
+			InterCodes code2 = InterCodes_init();
+			code2->onlyop.op->kind = PARAM_op;
+			strcpy(code1->onlyop.op->func,q->name);	
+			code1 = InterCodes_link(code1, code2);
+			param = param->tail;
+		}
+		return code1;
+	}
+	else 			//ID LP RP
+		return code1;
 }
 InterCodes translate_Args(node* Args,Operand *arg,int num){
 	if(Args->child->brother == NULL){
