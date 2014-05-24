@@ -204,6 +204,8 @@ void show_all(char* output){
 			case DEC:
 				printf_DEC(p);
 				break;
+			case FUNC_I:
+				printf_Operand(p->code->onlyop.op);
 			default:
 				break;
 
@@ -834,23 +836,23 @@ InterCodes translate_VarDec(node* VarDec){
 		return code1;
 	}
 	else								//ID LB INT RB
-		translate_VarDec(VarDec->child,NULL);
+		translate_VarDec(VarDec->child);
 }
 InterCodes translate_Fundec(node* Fundec){
 	node* ID = Fundec->child;
 	InterCodes code1 = InterCodes_init();
-	code1->code->kind = FUNC;
+	code1->code->kind = FUNC_I;
 	code1->code->onlyop.op->kind = FUNC_op;
 	strcpy(code1->code->onlyop.op->func,ID->node_value);
 	if(strcmp(ID->brother->brother->name,"VarList") == 0){			//ID LP VarList RP
 		FieldList p = Findname(ID->node_value);	
-		FuncVar *q = p->func->brother;
+		FuncVar *q = p->type->func.brother;
 		while(q != NULL){
 			InterCodes code2 = InterCodes_init();
 			code2->code->onlyop.op->kind = PARAM_op;
 			strcpy(code1->code->onlyop.op->func,q->name);	
-			code1 = InterCodes_link(code1, code2);
-			param = param->tail;
+			InterCodes_link(code1, code2);
+			q = q->next;
 		}
 		return code1;
 	}
