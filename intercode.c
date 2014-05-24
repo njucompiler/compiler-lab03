@@ -181,6 +181,13 @@ void printf_WRITE(InterCodes q){
 	fputs("WRITE ",fp);
 	printf_Operand(p->onlyop.op);
 }
+void printf_FUNC(InterCodes q){
+	InterCode p = q->code;
+	fputs("FUNCTION ",fp);
+	printf_Operand(p->onlyop.op);
+	fputs(" :",fp);
+}
+
 void show_all(char* output){
 	fp = fopen(output,"w");
 	if ( !fp )
@@ -222,7 +229,8 @@ void show_all(char* output){
 				printf_DEC(p);
 				break;
 			case FUNC_I:
-				printf_Operand(p->code->onlyop.op);
+				printf_FUNC(p);
+				break;
 			case READ:
 				printf_READ(p);
 				break;
@@ -742,7 +750,7 @@ InterCodes translate_Def(node* deflist){
 }
 
 InterCodes translate_Deflist(node* deflist){
-	if(deflist != NULL){
+	if(deflist != NULL && deflist->child != NULL){
 		InterCodes codes1 = InterCodes_init();
 		InterCodes codes2 = InterCodes_init();
 		codes1 = translate_Def(deflist->child);
@@ -780,7 +788,11 @@ InterCodes translate_Extdeclist(node* Extdeclist) {
 	else if(Extdeclist->child->brother != NULL && strcmp(Extdeclist->child->brother->node_value, "COMMA") == 0){		//VarDec COMMA ExtDecList
 		code1 = translate_VarDec(Extdeclist->child);
 		code2 = translate_Extdeclist(Extdeclist->child->brother->brother);
-		InterCodes_link(code1, code2);
+		if(code1 == NULL){
+			code1 = code2;
+		}
+		else
+			InterCodes_link(code1, code2);
 		return code1;
 	}
 	else
@@ -792,7 +804,11 @@ InterCodes translate_Compst(node* CompSt){
 	InterCodes codes2 = InterCodes_init();
 	codes1 = translate_Deflist(CompSt->child->brother);
 	codes2 = translate_Stmtlist(CompSt->child->brother->brother);
-	InterCodes_link(codes1, codes2);
+	if(codes1 == NULL){
+		codes1 = codes2;
+	}
+	else
+		InterCodes_link(codes1, codes2);
 	return codes1;
 }
 
@@ -914,12 +930,16 @@ InterCodes translate_Stmt(node* Stmt){
 } 
 
 InterCodes translate_Stmtlist(node* Stmtlist){
-	if(Stmtlist != NULL){
+	if(Stmtlist != NULL && Stmtlist->child != NULL){
 		InterCodes codes1 = InterCodes_init();
 		InterCodes codes2 = InterCodes_init();
 		codes1 = translate_Stmt(Stmtlist->child);
 		codes2 = translate_Stmtlist(Stmtlist->child->brother);
-		InterCodes_link(codes1,codes2);
+		if(codes1 == NULL){
+			codes1 = codes2;
+		}
+		else
+			InterCodes_link(codes1,codes2);
 		return codes1;
 	}
 	else
@@ -934,16 +954,14 @@ InterCodes translate_VarDec(node* VarDec){
 		}
 		else if(p->type->kind == ARRAY || p->type->kind == STRUCTURE){
 			int size = getSize(p->type);
-			code1->code->assign.left->kind = VARIABLE;
-			strcpy(code1->code->assign.left->name,VarDec->child->node_value);
-			Operand temp = new_operand(1,size);
-			code1->code->assign.right = temp;
-			code1->code->kind = DEC;
+			code1->code = new_interCode(DEC);
+			code1->code->assign.left = new_operand_name(VarDec->child->node_value);
+			code1->code->assign.right = new_operand(1,size);
 		}
 		return code1;
 	}
 	else								//ID LB INT RB
-		translate_VarDec(VarDec->child);
+		return translate_VarDec(VarDec->child);
 }
 InterCodes translate_Fundec(node* Fundec){
 	node* ID = Fundec->child;
@@ -1097,6 +1115,9 @@ InterCodes translate_Array(node *Exp,Operand place){
 void intercode_aly(node *p){		
 	char name[20];
 	strcpy(name,p->name);
+	if (p == NULL){
+		return ;
+	}
 	if(strcmp(name,"ExtDef")==0){
 		InterCodes codes = translate_Extdef(p);
 		add_to_head(codes);
