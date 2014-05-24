@@ -102,7 +102,7 @@ int Find(char *name){//查找该名字是否在变量表
 FieldList Findname(char *name){
 	int i = hash_pjw(name);
 	if(SymbolTable[i] == NULL){
-		return 0;
+		return NULL;
 	}
 	FieldList p = SymbolTable[i];
 	while(p!=NULL){

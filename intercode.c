@@ -122,6 +122,52 @@ void printf_RETURN(InterCodes q){
 	fputs("RETURN ",fp);
 	printf_Operand(p->onlyop.op);
 }
+void printf_CALL(InterCodes q){
+	InterCode p = q->code;
+	printf_operand(p->assign.left);
+	fputs(" :=CALL ",fp);
+	printf_operand(p->assign.right);
+}
+void printf_DEC(InterCodes q){
+	InterCode p = q->code;
+	fputs("DEC ",fp);
+	printf_operand(p->assign.left);
+	fputs(" ",fp);
+	printf_operand(p->asssign.right);
+}
+void printf_ARG(InterCodes q){
+	InterCode p = q->code;
+	fputs("ARG ");
+	printf_operand(p->onlyop.op);
+}
+void printf_COND(InterCodes q){
+	InterCode p = q->code;
+	fputs("IF ");
+	printf_operand(p->cond.x);
+	switch(p->cond.RELOP){
+		case EQUAL:
+			fputs(" == ");
+		break;
+		case NEQUAL:
+			fputs(" != ");
+		break;
+		case MORE:
+			fputs(" > ");
+		break;
+		case LESS:
+			fputs(" < ");
+		break;
+		case MORE_E:
+			fputs(" >= ");
+		break;
+		case LESS_E:
+			fputs(" >= ");
+		break;
+	}
+	printf_operand(p->cond.y);
+	fputs(" goto ");
+	printf_operand(p->cond.z);
+}
 void show_all(char* output){
 	fp = fopen(output,"w");
 	if ( !fp )
