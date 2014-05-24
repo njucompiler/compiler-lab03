@@ -296,14 +296,16 @@ InterCodes translate_Exp(node* exp,Operand place){
 		codes2->code = new_interCode(0);
 		codes2->code->assign.left = new_operand_name(exp->child->node_value);
 		codes2->code->assign.right = t;
-		InterCodes codes3 = InterCodes_init();
-		codes3->code = new_interCode(0);
-		codes3->code->assign.left = place;
-		codes3->code->assign.right = new_operand_name(exp->child->node_value);
-
 		InterCodes_link(codes1,codes2);
-		codes2->next = codes3;
-		codes3->prev = codes2;
+
+		if(place != NULL){
+			InterCodes codes3 = InterCodes_init();
+			codes3->code = new_interCode(0);
+			codes3->code->assign.left = place;
+			codes3->code->assign.right = new_operand_name(exp->child->node_value);
+			InterCodes_link(codes1,codes3);
+		}
+		
 		return codes1;
 	}
 	//-------------------------------------------------Exp AND Exp
@@ -486,7 +488,8 @@ InterCodes translate_Exp(node* exp,Operand place){
 
 	//--------------------------------------------------LP Exp RP
 	else if(exp->exp_type == 15){
-		
+		Operand t = new_temp();
+		return translate_Exp(exp->child->brother,t);
 	}
 
 	//--------------------------------------------------MINUS Exp
@@ -754,16 +757,8 @@ InterCodes translate_Compst(node* CompSt){
 
 InterCodes translate_Stmt(node* Stmt){
 	if(strcmp(Stmt->child->name,"Exp") == 0){
-		InterCodes codes = translate_Exp(Stmt->child,NULL);
-		InterCodes temp = codes;
-		while(temp->next != NULL){
-			temp = temp->next;
-		}
-		temp = temp->prev;
-		temp->next->prev = NULL;
-		free(temp->next);
-		temp->next = NULL;
-		return codes;
+		Operand t = new_temp();
+		return translate_Exp(Stmt->child,t);
 	}
 	else if(strcmp(Stmt->child->name,"CompSt") == 0){
 		return translate_Compst(Stmt->child);

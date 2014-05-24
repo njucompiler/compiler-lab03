@@ -622,6 +622,10 @@ void Stmt_anly(node *p){//p is the first child of the Stmt
 	else if(strcmp(func_return,p->brother->node_value)==0){
 		return;
 	}
+	///////////??????????????
+	else if(p->brother->type == 0){
+		return;
+	}
 	printf("Error type 8 at line %d: The return type mismatched\n",p->brother->line);
 }
 
