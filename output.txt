@@ -1,7 +1,0 @@
-FUNCTION add :
-PARAM a
-t2 := #1
-tp := t2
-t1 := tp
-t3 := a
-RETURN t3

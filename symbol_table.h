@@ -136,7 +136,7 @@ char *get_Array(char *name){//返回数组存储元素的类型
 }
 
 char* FindStruct(char *name,char *insname){//确定inname是否在该struct中
-	int i = hash_pjw(name);printf("insna:%s\n",insname);
+	int i = hash_pjw(name);
 	FieldList p = SymbolTable[i];
 	while(p!=NULL){
 		if(strcmp(p->name,name) == 0)
@@ -576,7 +576,7 @@ void FUNC_Insert(node *ExtDef){
 }
 void varStruct_Insert(char *name,char *spec){
 	int i = hash_pjw(name);
-	int j = hash_pjw(spec);printf("name:%s\n",name);printf("spec:%s\n",spec);
+	int j = hash_pjw(spec);
 	if(SymbolTable[i] == NULL){
 		SymbolTable[i] = FieldList_init();
 		strcpy(SymbolTable[i]->name,name);

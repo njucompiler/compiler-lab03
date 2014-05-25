@@ -592,8 +592,8 @@ void FunDec_def(node *p){
 	if(Find(FunDec->child->node_value)==1){//var is already in the table
 		printf("Error type 4 at line %d: Redefined function “%s” \n",FunDec->line,FunDec->child->node_value);
 	}
-	else if(strcmp(p->child->brother->brother->name,"VarList")==0){
-		Varlist_anly(p->child->brother->brother);
+	else if(strcmp(FunDec->child->brother->brother->name,"VarList")==0){
+		Varlist_anly(FunDec->child->brother->brother);
 	}
 	else{
 		FUNC_Insert(p);

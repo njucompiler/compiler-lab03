@@ -133,7 +133,7 @@ void printf_LABEL(InterCodes q){
 	InterCode p = q->code;
 	fputs("LABEL ",fp);
 	printf_Operand(p->onlyop.op);
-	fputs(":",fp);
+	fputs(" :",fp);
 }
 void printf_GOTO(InterCodes q){
 	InterCode p = q->code;
