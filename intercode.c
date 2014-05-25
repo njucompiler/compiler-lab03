@@ -85,7 +85,7 @@ void printf_Operand(Operand p){
 			fprintf(fp,"%s",p->op);
 			break;
 		case REFERENCE:
-			fprintf(fp,"&v%s",p->name);
+			fprintf(fp,"&%s",p->name);
 			break;
 		default:
 			break;
@@ -1023,11 +1023,11 @@ InterCodes translate_Struct(node *Exp,Operand place){
 	int size = 0;
 	if(strcmp(Exp->child->child->name,"ID") == 0){		//ID1.ID2
 		node *ID2 = Exp->child->brother->brother;
-		node *ID1 = Exp->child;;printf("%s\n",ID1->node_value);	;printf("%s\n",ID2->node_value);	
+		node *ID1 = Exp->child;	
 		//char typename[20];
 		//strcpy(typename,FindStruct(ID1->node_value,ID2->node_value));
-		FieldList p = Findname(ID1->node_value);printf("%s\n",p->name);
-		p = p->brother;printf("%s\n",ID1->node_value);	
+		FieldList p = Findname(ID1->node_value);printf("%s\n",ID1->node_value);	
+		p = p->brother;
 		while(p!=NULL){
 			if(strcmp(p->name,Exp->child->brother->brother->child->node_value) == 0)
 				break;
@@ -1040,7 +1040,7 @@ InterCodes translate_Struct(node *Exp,Operand place){
 		code1->code->binop.result = place;
 		code1->code->binop.op1 = op1;
 		code1->code->binop.op2 = op2;
-		place->kind = ADDR_op;
+		place->kind = ADDR_op;printf("ssssssssssssssssssss\n");
 		return code1;
 	}
 	else if(strcpy(Exp->child->child->name,"Exp") == 0){
