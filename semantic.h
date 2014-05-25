@@ -429,7 +429,7 @@ void exp_cal(node* exp){//exp is the node exp
 			strcat(exp->node_value,".");
 			strcat(exp->node_value,exp->child->brother->brother->node_value);
 			char* type = FindStruct(exp->child->node_value,exp->child->brother->brother->node_value);
-			printf("type:%s\n",type);
+			//printf("type:%s\n",type);
 			if(strcmp(type,"int")==0){
 				exp->type = 5;
 			}

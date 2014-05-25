@@ -232,7 +232,7 @@ void show_all(char* output){
 			case DEC:
 				printf_DEC(p);
 				break;
-			case FUNC_I:printf("%d\n",p->code->kind);
+			case FUNC_I:
 				printf_FUNC(p);
 				break;
 			case READ:
@@ -321,21 +321,31 @@ InterCodes translate_Exp(node* exp,Operand place){
 		InterCodes codes1 ;
 		codes1 = translate_Exp(exp->child->brother->brother,t);
 
-		Operand t2 =new_temp();
-		InterCodes codes2 = translate_Exp(exp->child,t2);
-		/*codes2->code = new_interCode(0);
-		codes2->code->assign.left = new_operand_name(exp->child->node_value);
-		codes2->code->assign.right = t;
-		InterCodes_link(codes1,codes2);*/
-
-		if(place != NULL){
-			InterCodes codes3 = InterCodes_init();
-			codes3->code = new_interCode(0);
-			codes3->code->assign.left = place;
-			codes3->code->assign.right = t2;
-			InterCodes_link(codes1,codes3);
+		if(strcmp(exp->child->child->name,"ID")==0){
+			InterCodes codes2 = InterCodes_init();
+			codes2->code = new_interCode(0);
+			codes2->code->assign.left = new_operand_name(exp->child->node_value);
+			codes2->code->assign.right = t;
+			InterCodes_link(codes1,codes2);
+			/*if(place != NULL){
+				InterCodes codes3 = InterCodes_init();
+				codes3->code = new_interCode(0);
+				codes3->code->assign.left = place;
+				codes3->code->assign.right = codes2->code->assign.left;
+				InterCodes_link(codes1,codes3);
+			}*/
 		}
-		
+		else{
+			Operand t2 =new_temp();
+			InterCodes codes2 = translate_Exp(exp->child,t2);
+			if(place != NULL){
+				InterCodes codes3 = InterCodes_init();
+				codes3->code = new_interCode(0);
+				codes3->code->assign.left = place;
+				codes3->code->assign.right = t2;
+				InterCodes_link(codes1,codes3);
+			}
+		}
 		return codes1;
 	}
 	//-------------------------------------------------Exp AND Exp
@@ -465,8 +475,8 @@ InterCodes translate_Exp(node* exp,Operand place){
 		codes2 = translate_Exp(exp->child,t2);
 		codes3->code = new_interCode(2);//sub
 		codes3->code->binop.result = place;
-		codes3->code->binop.op1 = t1;
-		codes3->code->binop.op2 = t2;
+		codes3->code->binop.op1 = t2;
+		codes3->code->binop.op2 = t1;
 
 		InterCodes_link(codes1,codes2);
 		InterCodes_link(codes2,codes3);
@@ -672,7 +682,6 @@ InterCodes translate_Cond(node* exp,Operand true_place,Operand false_place){
 		codes3->code->cond.op2 = t2;
 		codes3->code->cond.op = new_operand(op,0);
 		strcpy(codes3->code->cond.op->op,exp->child->brother->node_value);
-		printf("op:%s\n", codes3->code->cond.op->op);
 		InterCodes codes4 = InterCodes_init();
 		codes4->code = new_interCode(GOTO);
 		codes4->code->onlyop.op = true_place;
@@ -792,7 +801,11 @@ InterCodes translate_Extdef(node* ExtDef) {
 	else if(strcmp(ExtDef->child->brother->name, "FunDec") == 0){
 		code1 = translate_Fundec(ExtDef->child->brother);
 		code2 = translate_Compst(ExtDef->child->brother->brother);
-		InterCodes_link(code1, code2);
+		if(code1 == NULL){
+			code1 = code2;
+		}
+		else
+			InterCodes_link(code1, code2);
 		return code1;
 	}
 	//Specifier SEMI
@@ -1055,7 +1068,7 @@ InterCodes translate_Struct(node *Exp,Operand place){
 		node *ID1 = Exp->child->child;	
 		//char typename[20];
 		//strcpy(typename,FindStruct(ID1->node_value,ID2->node_value));
-		FieldList p = Findname(ID1->node_value);printf("%s\n",ID1->node_value);	
+		FieldList p = Findname(ID1->node_value);
 		p = p->brother;
 		while(p!=NULL){
 			if(strcmp(p->name,Exp->child->brother->brother->node_value) == 0)
