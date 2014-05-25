@@ -717,9 +717,9 @@ void STRUCT_Insert(node *p){
 				else {
 					temp->type->kind = STRUCTURE;
 					strcmp(temp->type->name,TYPEorSTRUCT->child->brother->node_value);
-				}*/
+				}
 				temp->child = NULL;
-				temp->brother = NULL;	
+				temp->brother = NULL;	*/
 				if(!DefList->child->brother)
 					DefList = DefList->child->brother;
 				else break;
