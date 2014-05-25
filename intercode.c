@@ -85,7 +85,7 @@ void printf_Operand(Operand p){
 			fprintf(fp,"%s",p->op);
 			break;
 		case REFERENCE:
-			fprintf(fp,"&%s",p->name);
+			fprintf(fp,"&%d",p->var_no);
 			break;
 		default:
 			break;
@@ -583,7 +583,7 @@ InterCodes translate_Exp(node* exp,Operand place){
 		int i = 0;
    		for(;i < arg_num;i++){
    			InterCodes codes2 = InterCodes_init();
-   			codes2->code = new_interCode(ARG);
+   			codes2->code = new_interCode(ARG);//codes2->code->kind = REFERENCE;	////////////////////////////////
    			codes2->code->onlyop.op = arg_list[i];
 
    			InterCodes_link(codes1,codes2);
@@ -1001,17 +1001,41 @@ InterCodes translate_Fundec(node* Fundec){
 }
 InterCodes translate_Args(node* Args,Operand *arg,int* num){
 	if(Args->child->brother == NULL){
-		InterCodes code1;
+		InterCodes code1 = InterCodes_init();
+		if(strcmp(Args->child->child->name,"ID") == 0){
+			FieldList p = Findname(Args->child->child->node_value);
+			if(p->type->kind!=Int && p->type->kind!=Float){
+				Operand op = new_temp();
+				Operand re = new_operand_name(p->name);
+				code1->code = new_interCode(ASSIGN);
+				code1->code->assign.right = re;
+				code1->code->assign.left = op;
+				return code1;
+			}
+		}
 		Operand op = new_temp();
 		code1 = translate_Exp(Args->child, op);
 		arg[(*num)++] = op; 
 		return code1;
 	}
 	else{
-		InterCodes code1;
-		Operand op = new_temp();
-		code1 = translate_Exp(Args->child, op);
-		arg[(*num)++] = op;
+		InterCodes code1 = InterCodes_init();
+		if(strcmp(Args->child->child->name,"ID") == 0){
+			FieldList p = Findname(Args->child->child->node_value);
+			if(p->type->kind!=Int && p->type->kind!=Float){
+				Operand op = new_temp();
+				Operand re = new_operand_name(p->name);
+				code1->code = new_interCode(ASSIGN);
+				code1->code->assign.right = re;
+				code1->code->assign.left = op;
+				arg[(*num)++] = op;
+			}
+		}
+		else{
+			Operand op = new_temp();
+			code1 = translate_Exp(Args->child, op);
+			arg[(*num)++] = op;
+		}
 		InterCodes code2 = translate_Args(Args,arg,num);
 		InterCodes_link(code1,code2);
 		return code1;
