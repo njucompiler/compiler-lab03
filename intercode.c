@@ -187,7 +187,11 @@ void printf_FUNC(InterCodes q){
 	printf_Operand(p->onlyop.op);
 	fputs(" :",fp);
 }
-
+void printf_PARAM(InterCodes q){
+	InterCode p = q->code;
+	fputs("PARAM ",fp);
+	printf_Operand(p->onlyop.op);
+}
 void show_all(char* output){
 	fp = fopen(output,"w");
 	if ( !fp )
@@ -240,6 +244,8 @@ void show_all(char* output){
 			case ARG:
 				printf_ARG(p);
 				break;
+			case PARAM_I:
+				printf_PARAM(p);
 			default:
 				break;
 
@@ -967,16 +973,16 @@ InterCodes translate_Fundec(node* Fundec){
 	node* ID = Fundec->child;
 	InterCodes code1 = InterCodes_init();
 	code1->code = new_interCode(FUNC_I);
-	code1->code->onlyop.op = new_operand_name(ID->node_value);
+	code1->code->onlyop.op = new_operand_name(ID->node_value);printf("name:    %s\n",ID->node_value);
 	if(strcmp(ID->brother->brother->name,"VarList") == 0){			//ID LP VarList RP
-		FieldList p = Findname(ID->node_value);	
+		FieldList p = Findname(ID->node_value);
 		FuncVar *q = p->type->func.brother;
 		while(q != NULL){
 			InterCodes code2 = InterCodes_init();
-			code2->code = new_interCode(PARAM_op);
-			code1->code->onlyop.op = (Operand)malloc(sizeof(Operand_));
-			code1->code->onlyop.op->kind = FUNC_op; 
-			strcpy(code1->code->onlyop.op->func,q->name);	
+			code2->code = new_interCode(PARAM_I);
+			code2->code->onlyop.op = (Operand)malloc(sizeof(Operand_));
+			code2->code->onlyop.op->kind = PARAM_op; 
+			strcpy(code2->code->onlyop.op->param,q->name);	
 			InterCodes_link(code1, code2);
 			q = q->next;
 		}
@@ -1009,10 +1015,10 @@ InterCodes translate_Struct(node *Exp,Operand place){
 	if(strcmp(Exp->child->child->name,"ID") == 0){		//ID1.ID2
 		node *ID2 = Exp->child->brother->brother;
 		node *ID1 = Exp->child;
-		char typename[20];
-		strcpy(typename,FindStruct(ID1->node_value,ID2->node_value));
-		FieldList p = Findname(ID1->child->node_value);	
-		p = p->brother;
+		//char typename[20];
+		//strcpy(typename,FindStruct(ID1->node_value,ID2->node_value));
+		FieldList p = Findname(ID1->node_value);
+		p = p->brother;printf("%s\n",ID1->node_value);	
 		while(p!=NULL){
 			if(strcmp(p->name,Exp->child->brother->brother->child->node_value) == 0)
 				break;

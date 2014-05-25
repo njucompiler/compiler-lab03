@@ -45,7 +45,7 @@ node* node_init();
 
 %%
 Program		
-	:	ExtDefList			{$$ = reduction("Program", @1.first_line,1, $1);printf("\n");if(!is_error){	Stackhead_init();add_write();add_read();sem_analysis($$);show_tree($$, 0);printfile($$);} free_tree($$); }
+	:	ExtDefList			{$$ = reduction("Program", @1.first_line,1, $1);printf("\n");if(!is_error){	Stackhead_init();add_read();add_write();sem_analysis($$);if(Find("fact")==1)printf("success\n");show_tree($$, 0);printfile($$);} free_tree($$); }
 	;
 ExtDefList
 	:	ExtDef ExtDefList		{ $$ = reduction("ExtDefList", @1.first_line,2,$1, $2); }

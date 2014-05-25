@@ -144,27 +144,27 @@ char* FindStruct(char *name,char *insname){//确定inname是否在该struct中
 		p = p->child;
 	}
 	char sname[20];
-	strcpy(sname,p->type->name);
+	/*strcpy(sname,p->type->name);
 	int j = hash_pjw(sname);
 	FieldList q = SymbolTable[j];
 	while(q!=NULL){
 		if(strcmp(q->name,sname) == 0)
 			break;
 		q = q->child;
-	}
-	while(q->brother!=NULL){
-		q=q->brother;
-		if(strcmp(q->name,insname)==0){
-			if(q->type->kind == Int)
+	}*/
+	while(p->brother!=NULL){
+		p=p->brother;
+		if(strcmp(p->name,insname)==0){
+			if(p->type->kind == Int)
 				return "int";
-			else if(q->type->kind == Float)
+			else if(p->type->kind == Float)
 				return "float";
-			else if(q->type->kind == ARRAY){
+			else if(p->type->kind == ARRAY){
 				//return "array";
-				return get_Array(q->name);
+				return get_Array(p->name);
 			}
 			else{
-				return q->type->name;
+				return p->type->name;
 			}
 		}
 	}
@@ -268,9 +268,11 @@ int Args_match(node *ID){//函数参数匹配
 
 int get_kind(char *name){//获得存储元素的类型
 	int i = hash_pjw(name);
-	while(SymbolTable[i] != NULL){
-		if(strcmp(SymbolTable[i]->name,name) == 0) 
+	FieldList p  = SymbolTable[i];
+	while(p != NULL){
+		if(strcmp(p->name,name) == 0) 
 			return SymbolTable[i]->type->kind;
+		p = p->child;
 	}
 	return -1;
 }
@@ -316,7 +318,7 @@ void INT_Insert(char *name,int value){
 	else{
 		FieldList p = FieldList_init();
 		p->child = SymbolTable[i]->child;
-		SymbolTable[i] = p;
+		SymbolTable[i]->child = p;
 		strcpy(p->name,name);
 		p->type->kind = Int;
 		p->type->INT = value;
@@ -325,8 +327,8 @@ void INT_Insert(char *name,int value){
 			head->child = p;
 		}
 		else{
-			SymbolTable[i]->scope = head->child;
-			head->child = SymbolTable[i];
+			p->scope = head->child;
+			head->child = p;
 		}
 	}
 }
@@ -349,7 +351,7 @@ void FLOAT_Insert(char *name,float value){
 	else{
 		FieldList p = FieldList_init();
 		p->child = SymbolTable[i]->child;
-		SymbolTable[i] = p;
+		SymbolTable[i]->child = p;
 		strcpy(p->name,name);
 		p->type->kind = Float;
 		p->type->FLOAT = value;
@@ -358,8 +360,8 @@ void FLOAT_Insert(char *name,float value){
 			head->child = p;
 		}
 		else{
-			SymbolTable[i]->scope = head->child;
-			head->child = SymbolTable[i];
+			p->scope = head->child;
+			head->child = p;
 		}
 	}
 }
@@ -372,7 +374,7 @@ void FUNC_Insert(node *ExtDef){
 		int i = hash_pjw(FunDec->child->node_value);
 		if(SymbolTable[i] == NULL){
 			SymbolTable[i] = FieldList_init();
-			strcpy(SymbolTable[i]->name,FunDec->child->node_value);
+			strcpy(SymbolTable[i]->name,FunDec->child->node_value);printf("name:%s\n",SymbolTable[i]->name);
 			SymbolTable[i]->type->kind = FUNC;
 			//node *DefList = q1->child->brother->brother->brother;		//STRUCT(child) OptTag(b) LC(b) DefList(b) RC(b)
 			/*deflist (c)def (b)deflist*/
@@ -449,7 +451,7 @@ void FUNC_Insert(node *ExtDef){
 		else{
 			FieldList p = FieldList_init();
 			p->child = SymbolTable[i]->child;
-			SymbolTable[i] = p;
+			SymbolTable[i]->child = p;
 			strcpy(p->name,FunDec->child->node_value);
 			p->type->kind = FUNC;
 			//node *DefList = q1->child->brother->brother->brother;		//STRUCT(child) OptTag(b) LC(b) DefList(b) RC(b)
@@ -518,8 +520,8 @@ void FUNC_Insert(node *ExtDef){
 				head->child = p;
 			}
 			else{
-				SymbolTable[i]->scope = head->child;
-				head->child = SymbolTable[i];
+				p->scope = head->child;
+				head->child = p;
 			}
 		}
 	}
@@ -549,7 +551,7 @@ void FUNC_Insert(node *ExtDef){
 		else{
 			FieldList p = FieldList_init();
 			p->child = SymbolTable[i]->child;
-			SymbolTable[i] = p;
+			SymbolTable[i]->child = p;
 			strcpy(p->name,Specifier->child->node_value);
 			p->type->kind = FUNC;
 			p->type->func.brother = NULL;
@@ -565,8 +567,8 @@ void FUNC_Insert(node *ExtDef){
 				head->child = p;
 			}
 			else{
-				SymbolTable[i]->scope = head->child;
-				head->child = SymbolTable[i];
+				p->scope = head->child;
+				head->child = p;
 			}
 		}
 	}
@@ -591,7 +593,7 @@ void varStruct_Insert(char *name,char *spec){
 	else{
 		FieldList p = FieldList_init();
 		p->child = SymbolTable[i]->child;
-		SymbolTable[i] = p;
+		SymbolTable[i]->child = p;
 		strcpy(p->name,name);
 		p->type->kind = STRUCTVAR;
 		strcpy(SymbolTable[i]->type->name,spec);
@@ -600,8 +602,8 @@ void varStruct_Insert(char *name,char *spec){
 			head->child = p;
 		}
 		else{
-			SymbolTable[i]->scope = head->child;
-			head->child = SymbolTable[i];
+			p->scope = head->child;
+			head->child = p;
 		}
 	}	
 }
@@ -638,14 +640,14 @@ void STRUCT_Insert(node *p){
 					}
 					else break;
 				}
-				/*if(strcmp(TYPEorSTRUCT->node_value,"int"))
+				if(strcmp(TYPEorSTRUCT->node_value,"int"))
 					temp->type->kind = Int;
 				else if(strcmp(TYPEorSTRUCT->node_value,"float"))
 					temp->type->kind = Float;
 				else {
 					temp->type->kind = STRUCTURE;
 					strcmp(temp->type->name,TYPEorSTRUCT->child->brother->node_value);
-				}*/
+				}
 				temp->child = NULL;
 				temp->brother = NULL;	
 				if(!DefList->child->brother)
@@ -693,14 +695,14 @@ void STRUCT_Insert(node *p){
 					}
 					else break;
 				}
-				/*if(strcmp(TYPEorSTRUCT->node_value,"int"))
+				if(strcmp(TYPEorSTRUCT->node_value,"int"))
 					temp->type->kind = Int;
 				else if(strcmp(TYPEorSTRUCT->node_value,"float"))
 					temp->type->kind = Float;
 				else {
 					temp->type->kind = STRUCTURE;
 					strcmp(temp->type->name,TYPEorSTRUCT->child->brother->node_value);
-				}*/
+				}
 				temp->child = NULL;
 				temp->brother = NULL;	
 				if(!DefList->child->brother)
@@ -711,8 +713,8 @@ void STRUCT_Insert(node *p){
 				head->child = s;
 			}
 			else{
-				SymbolTable[i]->scope = head->child;
-				head->child = SymbolTable[i];
+				s->scope = head->child;
+				head->child = s;
 			}	
 		}
 	}
@@ -787,8 +789,8 @@ void ARRAY_Insert(node *VarDec,char *name,char *spec){
 			head->child = temp;
 		}
 		else{
-			SymbolTable[i]->scope = head->child;
-			head->child = SymbolTable[i];
+			temp->scope = head->child;
+			head->child = temp;
 		}
 	}
 }
@@ -804,15 +806,29 @@ void add_read(){
 		SymbolTable[i]->type->func.brother = NULL;
 		SymbolTable[i]->child = NULL;
 		SymbolTable[i]->brother = NULL;
+		if(head->child == NULL){
+			head->child = SymbolTable[i];
+		}
+		else{
+			SymbolTable[i]->scope = head->child;
+			head->child = SymbolTable[i];
+		}
 	}
 	else{
 		FieldList p = FieldList_init();
 		p->child = SymbolTable[i]->child;
-		SymbolTable[i] = p;
+		SymbolTable[i]->child = p;
 		strcpy(p->name,name);
 		strcpy(SymbolTable[i]->type->func.RETURN,"INT");
 		p->type->kind = FUNC;
-		p->type->func.brother = NULL;		
+		p->type->func.brother = NULL;	
+		if(head->child == NULL){
+			head->child = p;
+		}
+		else{
+			p->scope = head->child;
+			head->child = p;
+		}	
 	}
 }
 void add_write(){
@@ -831,11 +847,18 @@ void add_write(){
 		temp->next =NULL;
 		SymbolTable[i]->type->func.brother = temp;
 		strcpy(temp->kind,"INT");
+		if(head->child == NULL){
+			head->child = SymbolTable[i];
+		}
+		else{
+			SymbolTable[i]->scope = head->child;
+			head->child = SymbolTable[i];
+		}
 	}
 	else{
 		FieldList p = FieldList_init();
 		p->child = SymbolTable[i]->child;
-		SymbolTable[i] = p;
+		SymbolTable[i]->child = p;
 		strcpy(p->name,name);
 		strcpy(SymbolTable[i]->type->func.RETURN,"INT");
 		p->type->kind = FUNC;
@@ -844,6 +867,13 @@ void add_write(){
 		temp->next =NULL;
 		p->type->func.brother = temp;
 		strcpy(temp->kind,"INT");	
+		if(head->child == NULL){
+			head->child = p;
+		}
+		else{
+			p->scope = head->child;
+			head->child = p;
+		}
 	}
 }
 

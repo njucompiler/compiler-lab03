@@ -26,7 +26,7 @@ typedef struct Operand_ {
 }Operand_;
 typedef struct InterCode_
 {
-	enum { ASSIGN, ADD, SUB, MUL, DIVI, LAB, GOTO, RET, ADDR, COND,FUNC_I,DEC,READ,WRITE,CALL,ARG} kind;
+	enum { ASSIGN, ADD, SUB, MUL, DIVI, LAB, GOTO, RET, ADDR, COND,FUNC_I,DEC,READ,WRITE,CALL,ARG,PARAM_I} kind;
 	union {
 		struct { Operand right, left; } assign;
 		struct { Operand result, op1, op2; } binop;
