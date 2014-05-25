@@ -319,18 +319,20 @@ InterCodes translate_Exp(node* exp,Operand place){
 	if(exp->exp_type == 7){
 		Operand t = new_temp();		
 		InterCodes codes1 ;
-		InterCodes codes2 = InterCodes_init();
 		codes1 = translate_Exp(exp->child->brother->brother,t);
-		codes2->code = new_interCode(0);
+
+		Operand t2 =new_temp();
+		InterCodes codes2 = translate_Exp(exp->child,t2);
+		/*codes2->code = new_interCode(0);
 		codes2->code->assign.left = new_operand_name(exp->child->node_value);
 		codes2->code->assign.right = t;
-		InterCodes_link(codes1,codes2);
+		InterCodes_link(codes1,codes2);*/
 
 		if(place != NULL){
 			InterCodes codes3 = InterCodes_init();
 			codes3->code = new_interCode(0);
 			codes3->code->assign.left = place;
-			codes3->code->assign.right = new_operand_name(exp->child->node_value);
+			codes3->code->assign.right = t2;
 			InterCodes_link(codes1,codes3);
 		}
 		
