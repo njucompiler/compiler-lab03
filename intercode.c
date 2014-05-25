@@ -527,13 +527,15 @@ InterCodes translate_Exp(node* exp,Operand place){
 		InterCodes codes1 = InterCodes_init();
 		InterCodes codes2 = InterCodes_init();
 		codes1 = translate_Exp(exp->child->brother,t1);
-		codes2->code = new_interCode(0);
-		codes2->code->assign.left = place;
+		codes2->code = new_interCode(SUB);
+		codes2->code->binop.result = place;
 		t1->is_min = 1;
-		codes2->code->assign.right = t1;
+		codes2->code->binop.left = new_operand(1,0);
+		codes2->code->binop.right = t1;
 
 		InterCodes_link(codes1,codes2);
 		return codes1;
+
 	}
 
 	//---------------------------------------------------NOT Exp
