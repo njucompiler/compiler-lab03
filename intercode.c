@@ -148,7 +148,7 @@ void printf_RETURN(InterCodes q){
 void printf_CALL(InterCodes q){
 	InterCode p = q->code;
 	printf_Operand(p->assign.left);
-	fputs(" :=CALL ",fp);
+	fputs(" := CALL ",fp);
 	printf_Operand(p->assign.right);
 }
 void printf_DEC(InterCodes q){

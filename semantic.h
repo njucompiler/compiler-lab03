@@ -594,6 +594,7 @@ void FunDec_def(node *p){
 	}
 	else if(strcmp(FunDec->child->brother->brother->name,"VarList")==0){
 		Varlist_anly(FunDec->child->brother->brother);
+		FUNC_Insert(p);
 	}
 	else{
 		FUNC_Insert(p);
