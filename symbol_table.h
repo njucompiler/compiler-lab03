@@ -124,10 +124,10 @@ char *get_Array(char *name){//返回数组存储元素的类型
 	temp = p->type;
 	while(temp->array.elem!=NULL)
 		temp = temp->array.elem;
-	if(temp->array.elem->kind == Int){
+	if(temp->kind == Int){
 		return "int";
 	}
-	else if(temp->array.elem->kind == Float){
+	else if(temp->kind == Float){
 		return "float";
 	}
 	else{

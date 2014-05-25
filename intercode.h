@@ -12,7 +12,7 @@ typedef struct InterCode_* InterCode;
 typedef struct InterCodes_* InterCodes;
 
 typedef struct Operand_ {
-	enum { VARIABLE, CONSTANT, ADDRESS, TEMP, LABEL, FUNC_op, PARAM_op, ADDR_op, op} kind;
+	enum { VARIABLE, CONSTANT, ADDRESS, TEMP, LABEL, FUNC_op, PARAM_op, ADDR_op, op,RERERENCE} kind;
 	int is_min;
 	union {
 	char op[3];//==,<=,>=,!=,>,<

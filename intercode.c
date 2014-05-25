@@ -66,9 +66,6 @@ void printf_Operand(Operand p){
 		case CONSTANT:
 			fprintf(fp,"#%d",p->value);
 			break;
-		case ADDRESS:
-			fprintf(fp,"#%d",p->value);
-			break;
 		case TEMP:
 			fprintf(fp,"t%d",p->var_no);
 			break;
@@ -87,6 +84,8 @@ void printf_Operand(Operand p){
 		case op:
 			fprintf(fp,"%s",p->op);
 			break;
+		case REFERENCE:
+			fprintf(fp,"&v%s",p->name);
 		default:
 			break;
 	}
@@ -199,8 +198,8 @@ void show_all(char* output){
 		perror(output);
 		return ;
 	}
-	InterCodes p = intercodes_head->next;int i = 0;
-	while(p!=NULL){i++;
+	InterCodes p = intercodes_head->next;assert(p->code!=NULL);
+	while(p!=NULL){
 		switch(p->code->kind){
 			case ASSIGN:
 				printf_ASSIGN(p);
@@ -232,7 +231,7 @@ void show_all(char* output){
 			case DEC:
 				printf_DEC(p);
 				break;
-			case FUNC_I:
+			case FUNC_I:printf("%d\n",p->code->kind);
 				printf_FUNC(p);
 				break;
 			case READ:
@@ -249,6 +248,9 @@ void show_all(char* output){
 				break;
 			case CALL:
 				printf_CALL(p);
+				break;
+			case ADDR:
+				printf_ADD(p);
 				break;
 			default:
 				break;
@@ -1089,11 +1091,13 @@ InterCodes translate_Array(node *Exp,Operand place){
 		code4->code->binop.result = place;
 		code4->code->binop.op1 = op1;
 		code4->code->binop.op2 = t2;
-		InterCodes_link(code1,code2);
+		/*InterCodes_link(code1,code2);
 		InterCodes_link(code1,code3);
-		InterCodes_link(code1,code4);
+		InterCodes_link(code1,code4);*/
+		InterCodes_link(code2,code3);
+		InterCodes_link(code2,code4);
 		place->kind = ADDR_op;
-		return code1;
+		return code2;
 	}
 	else if(strcpy(Exp->child->child->name,"Exp") == 0)			//Exp[Exp][Exp]
 	{
@@ -1119,12 +1123,15 @@ InterCodes translate_Array(node *Exp,Operand place){
 		code4->code->binop.result = place;
 		code4->code->binop.op1 = op1;
 		code4->code->binop.op2 = t2;
-		InterCodes_link(code1,code2);
+		/*InterCodes_link(code1,code2);
 		InterCodes_link(code1,code3);
 		InterCodes_link(code1,code4);
-		InterCodes_link(code1,code);
+		InterCodes_link(code1,code);*/
+	InterCodes_link(code2,code3);
+	InterCodes_link(code2,code4);
+	InterCodes_link(code2,code);
 		place->kind = ADDR_op;
-		return code1;
+		return code2;
 	}
 
 }
