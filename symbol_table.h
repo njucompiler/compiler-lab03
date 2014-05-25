@@ -576,7 +576,7 @@ void FUNC_Insert(node *ExtDef){
 }
 void varStruct_Insert(char *name,char *spec){
 	int i = hash_pjw(name);
-	int j = hash_pjw(spec);printf("name:%s\n",name);printf("spec:%s\n",spec);
+	int j = hash_pjw(spec);
 	if(SymbolTable[i] == NULL){
 		SymbolTable[i] = FieldList_init();
 		strcpy(SymbolTable[i]->name,name);
@@ -639,9 +639,9 @@ void STRUCT_Insert(node *p){
 				node *DecList = DefList->child->child->brother;
 				while(DecList!=NULL){
 					node *vardec = DecList->child->child;
-					if(strcmp(TYPEorSTRUCT->node_value,"int"))
+					if(strcmp(TYPEorSTRUCT->node_value,"int") == 0)
 						temp->type->kind = Int;
-					else if(strcmp(TYPEorSTRUCT->node_value,"float"))
+					else if(strcmp(TYPEorSTRUCT->node_value,"float") == 0)
 						temp->type->kind = Float;
 					else {
 						temp->type->kind = STRUCTURE;
@@ -694,9 +694,9 @@ void STRUCT_Insert(node *p){
 				node *DecList = DefList->child->child->brother;
 				while(DecList!=NULL){
 					node *vardec = DecList->child->child;
-					if(strcmp(TYPEorSTRUCT->node_value,"int"))
+					if(strcmp(TYPEorSTRUCT->node_value,"int") == 0)
 						temp->type->kind = Int;
-					else if(strcmp(TYPEorSTRUCT->node_value,"float"))
+					else if(strcmp(TYPEorSTRUCT->node_value,"float") == 0)
 						temp->type->kind = Float;
 					else {
 						temp->type->kind = STRUCTURE;
@@ -710,14 +710,14 @@ void STRUCT_Insert(node *p){
 					}
 					else break;
 				}
-				if(strcmp(TYPEorSTRUCT->node_value,"int"))
+				/*if(strcmp(TYPEorSTRUCT->node_value,"int"))
 					temp->type->kind = Int;
 				else if(strcmp(TYPEorSTRUCT->node_value,"float"))
 					temp->type->kind = Float;
 				else {
 					temp->type->kind = STRUCTURE;
 					strcmp(temp->type->name,TYPEorSTRUCT->child->brother->node_value);
-				}
+				}*/
 				temp->child = NULL;
 				temp->brother = NULL;	
 				if(!DefList->child->brother)

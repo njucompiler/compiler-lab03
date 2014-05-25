@@ -3,12 +3,8 @@ struct Operands
 int o1;
 int o2;
 };
-int main()
+int add(struct Operands temp)
 {
-int n;
-struct Operands op;
-op.o1 = 1;
-op.o2 = 2;
-return 0;
+return (temp.o1 + temp.o2);
 }
 
