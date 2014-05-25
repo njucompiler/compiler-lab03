@@ -1023,24 +1023,24 @@ InterCodes translate_Struct(node *Exp,Operand place){
 	int size = 0;
 	if(strcmp(Exp->child->child->name,"ID") == 0){		//ID1.ID2
 		node *ID2 = Exp->child->brother->brother;
-		node *ID1 = Exp->child;	
+		node *ID1 = Exp->child->child;	
 		//char typename[20];
 		//strcpy(typename,FindStruct(ID1->node_value,ID2->node_value));
 		FieldList p = Findname(ID1->node_value);printf("%s\n",ID1->node_value);	
 		p = p->brother;
 		while(p!=NULL){
-			if(strcmp(p->name,Exp->child->brother->brother->child->node_value) == 0)
+			if(strcmp(p->name,Exp->child->brother->brother->node_value) == 0)
 				break;
 			size = size + getSize(p->type);
 			p = p->brother;
 		}	
-		Operand op1 = new_operand_name(ID1->child->node_value);
+		Operand op1 = new_operand_name(ID1->node_value);op1->kind = ADDR_op;
 		Operand op2 = new_operand(1,size);
 		code1->code = new_interCode(ADDR);
 		code1->code->binop.result = place;
 		code1->code->binop.op1 = op1;
 		code1->code->binop.op2 = op2;
-		place->kind = ADDR_op;printf("ssssssssssssssssssss\n");
+		//place->kind = ADDR_op;
 		return code1;
 	}
 	else if(strcpy(Exp->child->child->name,"Exp") == 0){
@@ -1051,19 +1051,19 @@ InterCodes translate_Struct(node *Exp,Operand place){
 		FieldList p = Findname(ID1->child->node_value);	
 		p = p->brother;
 		while(p!=NULL){
-			if(strcmp(p->name,Exp->child->brother->brother->child->node_value) == 0)
+			if(strcmp(p->name,Exp->child->brother->brother->node_value) == 0)
 				break;
 			size = size + getSize(p->type);
 			p = p->brother;
 		}
-		Operand op1 = new_operand_name(ID1->child->node_value);
+		Operand op1 = new_operand_name(ID1->child->node_value);op1->kind = ADDR_op;
 		Operand op2 = new_operand(1,size);
 		code1->code = new_interCode(ADDR);
 		code2->code->binop.result = place;
 		code2->code->binop.op1 = op1;
 		code2->code->binop.op2 = op2;
 		InterCodes_link(code1,code2);
-		place->kind = ADDR_op;
+		//place->kind = ADDR_op;
 		return code1;
 	}
 }
