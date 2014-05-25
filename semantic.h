@@ -559,10 +559,41 @@ void Def_anly(node *p){//p is the first child of the Def
 	DecList_anly(p->node_value,DecList->child);
 }
 
+void Structspecifer_anly(node* structspecifer){
+	if(structspecifer->child->brother->brother != NULL){//define
+		if(Find(structspecifer->node_value)==1){
+			printf("Error type 16 at line %d: Duplicated name ‘%s’\n",structspecifer->line,structspecifer->node_value);
+		}
+		else
+			STRUCT_Insert(structspecifer);
+	}
+	else{
+		if(Find(structspecifer->node_value)==0){
+			printf("Error type 17 at line %d:Undefined struct ‘%s’\n",structspecifer->line,structspecifer->node_value);
+		}
+	}
+}
+
+void Varlist_anly(node* p){
+	node* ParamDec = p->child;
+	if(strcmp(ParamDec->child->child->name,"StructSpecifier")==0)
+		Structspecifer_anly(ParamDec->child->child);
+	Dec_anly(ParamDec->child->node_value,ParamDec->child->brother);
+	while(ParamDec->brother != NULL){
+		ParamDec = ParamDec->brother->brother->child;
+		if(strcmp(ParamDec->child->child->name,"StructSpecifier")==0)
+			Structspecifer_anly(ParamDec->child->child);
+		Dec_anly(ParamDec->child->node_value,ParamDec->child->brother);
+	}
+}
+
 void FunDec_def(node *p){
 	node* FunDec = p->child->brother;
 	if(Find(FunDec->child->node_value)==1){//var is already in the table
 		printf("Error type 4 at line %d: Redefined function “%s” \n",FunDec->line,FunDec->child->node_value);
+	}
+	else if(strcmp(p->child->brother->brother->name,"VarList")==0){
+		Varlist_anly(p->child->brother->brother);
 	}
 	else{
 		FUNC_Insert(p);

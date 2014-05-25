@@ -1,5 +1,7 @@
-t2 := #2
-t3 := #2
-t1 := t2 + t3
-b := t1
-t0 := b
+FUNCTION add :
+PARAM a
+t2 := #1
+tp := t2
+t1 := tp
+t3 := a
+RETURN t3

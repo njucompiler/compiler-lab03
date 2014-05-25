@@ -136,7 +136,7 @@ char *get_Array(char *name){//返回数组存储元素的类型
 }
 
 char* FindStruct(char *name,char *insname){//确定inname是否在该struct中
-	int i = hash_pjw(name);
+	int i = hash_pjw(name);printf("insna:%s\n",insname);
 	FieldList p = SymbolTable[i];
 	while(p!=NULL){
 		if(strcmp(p->name,name) == 0)
@@ -631,9 +631,10 @@ void STRUCT_Insert(node *p){
 			SymbolTable[i]->type->kind = STRUCTURE;
 			node *DefList = p->child->brother->brother->brother;		//STRUCT(child) OptTag(b) LC(b) DefList(b) RC(b)
 			FieldList temp = SymbolTable[i];
-			while(DefList!=NULL){
+			while(DefList!=NULL){if(DefList->child==NULL)break;	
 				temp->brother = FieldList_init();
-				temp = temp->brother;				
+				temp = temp->brother;	
+					
 				node *TYPEorSTRUCT = DefList->child->child->child;
 				node *DecList = DefList->child->child->brother;
 				while(DecList!=NULL){
@@ -654,7 +655,7 @@ void STRUCT_Insert(node *p){
 					}
 					else break;
 				}
-				if(strcmp(TYPEorSTRUCT->node_value,"int"))
+				/*if(strcmp(TYPEorSTRUCT->node_value,"int"))
 					temp->type->kind = Int;
 				else if(strcmp(TYPEorSTRUCT->node_value,"float"))
 					temp->type->kind = Float;
@@ -663,8 +664,8 @@ void STRUCT_Insert(node *p){
 					strcmp(temp->type->name,TYPEorSTRUCT->child->brother->node_value);
 				}
 				temp->child = NULL;
-				temp->brother = NULL;	
-				if(!DefList->child->brother)
+				temp->brother = NULL;	*/
+				if(DefList->child->brother!=NULL)
 					DefList = DefList->child->brother;
 				else break;
 	

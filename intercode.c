@@ -86,6 +86,7 @@ void printf_Operand(Operand p){
 			break;
 		case REFERENCE:
 			fprintf(fp,"&v%s",p->name);
+			break;
 		default:
 			break;
 	}
