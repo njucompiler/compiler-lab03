@@ -124,10 +124,10 @@ char *get_Array(char *name){//返回数组存储元素的类型
 	temp = p->type;
 	while(temp->array.elem!=NULL)
 		temp = temp->array.elem;
-	if(temp->array.elem->kind == Int){
+	if(temp->kind == Int){
 		return "int";
 	}
-	else if(temp->array.elem->kind == Float){
+	else if(temp->kind == Float){
 		return "float";
 	}
 	else{
@@ -374,7 +374,7 @@ void FUNC_Insert(node *ExtDef){
 		int i = hash_pjw(FunDec->child->node_value);
 		if(SymbolTable[i] == NULL){
 			SymbolTable[i] = FieldList_init();
-			strcpy(SymbolTable[i]->name,FunDec->child->node_value);printf("name:%s\n",SymbolTable[i]->name);
+			strcpy(SymbolTable[i]->name,FunDec->child->node_value);
 			SymbolTable[i]->type->kind = FUNC;
 			//node *DefList = q1->child->brother->brother->brother;		//STRUCT(child) OptTag(b) LC(b) DefList(b) RC(b)
 			/*deflist (c)def (b)deflist*/
@@ -576,12 +576,20 @@ void FUNC_Insert(node *ExtDef){
 }
 void varStruct_Insert(char *name,char *spec){
 	int i = hash_pjw(name);
+	int j = hash_pjw(spec);printf("name:%s\n",name);printf("spec:%s\n",spec);
 	if(SymbolTable[i] == NULL){
 		SymbolTable[i] = FieldList_init();
 		strcpy(SymbolTable[i]->name,name);
 		SymbolTable[i]->type->kind = STRUCTVAR;
 		strcpy(SymbolTable[i]->type->name,spec);
 		SymbolTable[i]->child = NULL;
+		FieldList q = SymbolTable[j];
+		while(q!=NULL){
+			if(strcmp(q->name,spec)==0)
+				break;
+			q = q->child;
+		}
+		SymbolTable[i]->brother = q->brother;
 		if(head->child == NULL){
 			head->child = SymbolTable[i];
 		}
@@ -597,7 +605,13 @@ void varStruct_Insert(char *name,char *spec){
 		strcpy(p->name,name);
 		p->type->kind = STRUCTVAR;
 		strcpy(SymbolTable[i]->type->name,spec);
-		p->child = NULL;
+		FieldList q = SymbolTable[j];
+		while(q!=NULL){
+			if(strcmp(q->name,spec)==0)
+				break;
+			q = q->child;
+		}
+		p->brother = q->brother;
 		if(head->child == NULL){
 			head->child = p;
 		}
@@ -617,9 +631,10 @@ void STRUCT_Insert(node *p){
 			SymbolTable[i]->type->kind = STRUCTURE;
 			node *DefList = p->child->brother->brother->brother;		//STRUCT(child) OptTag(b) LC(b) DefList(b) RC(b)
 			FieldList temp = SymbolTable[i];
-			while(DefList!=NULL){
+			while(DefList!=NULL){if(DefList->child==NULL)break;	
 				temp->brother = FieldList_init();
-				temp = temp->brother;				
+				temp = temp->brother;	
+					
 				node *TYPEorSTRUCT = DefList->child->child->child;
 				node *DecList = DefList->child->child->brother;
 				while(DecList!=NULL){
@@ -640,7 +655,7 @@ void STRUCT_Insert(node *p){
 					}
 					else break;
 				}
-				if(strcmp(TYPEorSTRUCT->node_value,"int"))
+				/*if(strcmp(TYPEorSTRUCT->node_value,"int"))
 					temp->type->kind = Int;
 				else if(strcmp(TYPEorSTRUCT->node_value,"float"))
 					temp->type->kind = Float;
@@ -649,8 +664,8 @@ void STRUCT_Insert(node *p){
 					strcmp(temp->type->name,TYPEorSTRUCT->child->brother->node_value);
 				}
 				temp->child = NULL;
-				temp->brother = NULL;	
-				if(!DefList->child->brother)
+				temp->brother = NULL;	*/
+				if(DefList->child->brother!=NULL)
 					DefList = DefList->child->brother;
 				else break;
 	
