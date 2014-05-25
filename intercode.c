@@ -246,6 +246,10 @@ void show_all(char* output){
 				break;
 			case PARAM_I:
 				printf_PARAM(p);
+				break;
+			case CALL:
+				printf_CALL(p);
+				break;
 			default:
 				break;
 
@@ -585,7 +589,9 @@ InterCodes translate_Exp(node* exp,Operand place){
    		InterCodes codes3 = InterCodes_init();
    		codes3->code = new_interCode(CALL);
    		codes3->code->assign.left = place;
-   		codes3->code->assign.right = new_operand_name(exp->child->name);
+   		codes3->code->assign.right = new_operand_name(exp->child->node_value);
+   		InterCodes_link(codes1,codes3);
+
   		return codes1;
 	}
 
@@ -996,14 +1002,14 @@ InterCodes translate_Args(node* Args,Operand *arg,int* num){
 		InterCodes code1;
 		Operand op = new_temp();
 		code1 = translate_Exp(Args->child, op);
-		arg[*num++] = op;
+		arg[(*num)++] = op; 
 		return code1;
 	}
 	else{
 		InterCodes code1;
 		Operand op = new_temp();
 		code1 = translate_Exp(Args->child, op);
-		arg[*num++] = op;
+		arg[(*num)++] = op;
 		InterCodes code2 = translate_Args(Args,arg,num);
 		InterCodes_link(code1,code2);
 		return code1;

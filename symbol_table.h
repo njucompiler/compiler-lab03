@@ -271,7 +271,7 @@ int get_kind(char *name){//获得存储元素的类型
 	FieldList p  = SymbolTable[i];
 	while(p != NULL){
 		if(strcmp(p->name,name) == 0) 
-			return SymbolTable[i]->type->kind;
+			return p->type->kind;
 		p = p->child;
 	}
 	return -1;
