@@ -271,7 +271,7 @@ int get_kind(char *name){//获得存储元素的类型
 	FieldList p  = SymbolTable[i];
 	while(p != NULL){
 		if(strcmp(p->name,name) == 0) 
-			return SymbolTable[i]->type->kind;
+			return p->type->kind;
 		p = p->child;
 	}
 	return -1;
@@ -374,7 +374,7 @@ void FUNC_Insert(node *ExtDef){
 		int i = hash_pjw(FunDec->child->node_value);
 		if(SymbolTable[i] == NULL){
 			SymbolTable[i] = FieldList_init();
-			strcpy(SymbolTable[i]->name,FunDec->child->node_value);printf("name:%s\n",SymbolTable[i]->name);
+			strcpy(SymbolTable[i]->name,FunDec->child->node_value);
 			SymbolTable[i]->type->kind = FUNC;
 			//node *DefList = q1->child->brother->brother->brother;		//STRUCT(child) OptTag(b) LC(b) DefList(b) RC(b)
 			/*deflist (c)def (b)deflist*/
@@ -576,12 +576,20 @@ void FUNC_Insert(node *ExtDef){
 }
 void varStruct_Insert(char *name,char *spec){
 	int i = hash_pjw(name);
+	int j = hash_pjw(spec);printf("name:%s\n",name);printf("spec:%s\n",spec);
 	if(SymbolTable[i] == NULL){
 		SymbolTable[i] = FieldList_init();
 		strcpy(SymbolTable[i]->name,name);
 		SymbolTable[i]->type->kind = STRUCTVAR;
 		strcpy(SymbolTable[i]->type->name,spec);
 		SymbolTable[i]->child = NULL;
+		FieldList q = SymbolTable[j];
+		while(q!=NULL){
+			if(strcmp(q->name,spec)==0)
+				break;
+			q = q->child;
+		}
+		SymbolTable[i]->brother = q->brother;
 		if(head->child == NULL){
 			head->child = SymbolTable[i];
 		}
@@ -597,7 +605,13 @@ void varStruct_Insert(char *name,char *spec){
 		strcpy(p->name,name);
 		p->type->kind = STRUCTVAR;
 		strcpy(SymbolTable[i]->type->name,spec);
-		p->child = NULL;
+		FieldList q = SymbolTable[j];
+		while(q!=NULL){
+			if(strcmp(q->name,spec)==0)
+				break;
+			q = q->child;
+		}
+		p->brother = q->brother;
 		if(head->child == NULL){
 			head->child = p;
 		}

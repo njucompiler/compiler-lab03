@@ -1014,10 +1014,10 @@ InterCodes translate_Struct(node *Exp,Operand place){
 	int size = 0;
 	if(strcmp(Exp->child->child->name,"ID") == 0){		//ID1.ID2
 		node *ID2 = Exp->child->brother->brother;
-		node *ID1 = Exp->child;
+		node *ID1 = Exp->child;;printf("%s\n",ID1->node_value);	;printf("%s\n",ID2->node_value);	
 		//char typename[20];
 		//strcpy(typename,FindStruct(ID1->node_value,ID2->node_value));
-		FieldList p = Findname(ID1->node_value);
+		FieldList p = Findname(ID1->node_value);printf("%s\n",p->name);
 		p = p->brother;printf("%s\n",ID1->node_value);	
 		while(p!=NULL){
 			if(strcmp(p->name,Exp->child->brother->brother->child->node_value) == 0)
