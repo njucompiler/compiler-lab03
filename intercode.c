@@ -85,7 +85,7 @@ void printf_Operand(Operand p){
 			fprintf(fp,"%s",p->op);
 			break;
 		case REFERENCE:
-			fprintf(fp,"&%s",p->name);
+			fprintf(fp,"&%d",p->var_no);
 			break;
 		default:
 			break;
@@ -587,7 +587,7 @@ InterCodes translate_Exp(node* exp,Operand place){
 		int i = 0;
    		for(;i < arg_num;i++){
    			InterCodes codes2 = InterCodes_init();
-   			codes2->code = new_interCode(ARG);
+   			codes2->code = new_interCode(ARG);//codes2->code->kind = REFERENCE;	////////////////////////////////
    			codes2->code->onlyop.op = arg_list[i];
 
    			InterCodes_link(codes1,codes2);
@@ -727,19 +727,21 @@ InterCodes translate_Dec(node* dec){
 	*	|	VarDec 
 	*	|	VarDec ASSIGNOP Exp
 	*/	
-
+		
 	if(dec->child->brother != NULL){
 		Operand t1 = new_temp();
-		InterCodes codes1 = translate_Exp(dec->child->brother->brother, t1);
-		//Operand t1 = new_temp();
-		//InterCodes codes1 = translate_Vardec(child, t1);
+		InterCodes codes2 = translate_Exp(dec->child->brother->brother, t1);
+		InterCodes codes1 = translate_VarDec(dec->child);
 		InterCodes codes3 = InterCodes_init();
 		codes3->code = new_interCode(0);
 		codes3->code->assign.left = new_operand_name(dec->child->node_value);
 		codes3->code->assign.right = t1;
+		InterCodes_link(codes1,codes2);
 		InterCodes_link(codes1,codes3);
-		//InterCodes_link(codes2,codes3);
 		return codes1;
+	}
+	else if(dec->child->brother == NULL){
+		return translate_VarDec(dec->child);
 	}
 	return NULL;
 }
@@ -970,8 +972,8 @@ InterCodes translate_VarDec(node* VarDec){
 		if(p->type->kind == Int || p->type->kind == Float){
 			return NULL;
 		}
-		else if(p->type->kind == ARRAY || p->type->kind == STRUCTURE){
-			int size = getSize(p->type);
+		else if(p->type->kind == ARRAY || p->type->kind == STRUCTVAR ){
+			int size = getSize(p);
 			code1->code = new_interCode(DEC);
 			code1->code->assign.left = new_operand_name(VarDec->child->node_value);
 			code1->code->assign.right = new_operand(1,size);
@@ -1005,17 +1007,41 @@ InterCodes translate_Fundec(node* Fundec){
 }
 InterCodes translate_Args(node* Args,Operand *arg,int* num){
 	if(Args->child->brother == NULL){
-		InterCodes code1;
+		InterCodes code1 = InterCodes_init();
+		/*if(strcmp(Args->child->child->name,"ID") == 0){
+			FieldList p = Findname(Args->child->child->node_value);
+			if(p->type->kind!=Int && p->type->kind!=Float){
+				Operand op = new_temp();
+				Operand re = new_operand_name(p->name);
+				code1->code = new_interCode(ASSIGN);
+				code1->code->assign.right = re;
+				code1->code->assign.left = op;
+				return code1;
+			}
+		}*/
 		Operand op = new_temp();
 		code1 = translate_Exp(Args->child, op);
 		arg[(*num)++] = op; 
 		return code1;
 	}
 	else{
-		InterCodes code1;
-		Operand op = new_temp();
-		code1 = translate_Exp(Args->child, op);
-		arg[(*num)++] = op;
+		InterCodes code1 = InterCodes_init();
+		if(strcmp(Args->child->child->name,"ID") == 0){
+			FieldList p = Findname(Args->child->child->node_value);
+			if(p->type->kind!=Int && p->type->kind!=Float){
+				Operand op = new_temp();
+				Operand re = new_operand_name(p->name);
+				code1->code = new_interCode(ASSIGN);
+				code1->code->assign.right = re;
+				code1->code->assign.left = op;
+				arg[(*num)++] = op;
+			}
+		}
+		else{
+			Operand op = new_temp();
+			code1 = translate_Exp(Args->child, op);
+			arg[(*num)++] = op;
+		}
 		InterCodes code2 = translate_Args(Args,arg,num);
 		InterCodes_link(code1,code2);
 		return code1;
@@ -1034,7 +1060,7 @@ InterCodes translate_Struct(node *Exp,Operand place){
 		while(p!=NULL){
 			if(strcmp(p->name,Exp->child->brother->brother->node_value) == 0)
 				break;
-			size = size + getSize(p->type);
+			size = size + getSize(p);
 			p = p->brother;
 		}	
 		Operand op1 = new_operand_name(ID1->node_value);op1->kind = ADDR_op;
@@ -1056,7 +1082,7 @@ InterCodes translate_Struct(node *Exp,Operand place){
 		while(p!=NULL){
 			if(strcmp(p->name,Exp->child->brother->brother->node_value) == 0)
 				break;
-			size = size + getSize(p->type);
+			size = size + getSize(p);
 			p = p->brother;
 		}
 		Operand op1 = new_operand_name(ID1->child->node_value);op1->kind = ADDR_op;
@@ -1077,7 +1103,7 @@ InterCodes translate_Array(node *Exp,Operand place){
 	//Operand t ;
 	if(strcpy(Exp->child->child->name,"ID") == 0){	//Exp[Exp]
 		if(p->type->array.elem->kind == STRUCTURE)
-			size = getSize(p->type->array.elem);
+			size = getSize(p);
 		else size = 4;
 		Operand op1 = new_operand_name(Exp->child->child->node_value);
 		InterCodes code2,code3,code4;
@@ -1106,7 +1132,7 @@ InterCodes translate_Array(node *Exp,Operand place){
 	else if(strcpy(Exp->child->child->name,"Exp") == 0)			//Exp[Exp][Exp]
 	{
 		if(p->type->array.elem->kind == STRUCTURE)
-			size = getSize(p->type->array.elem);
+			size = getSize(p);
 		else size = 4;
 		InterCodes code = InterCodes_init();
 		Operand temp = new_temp();
@@ -1227,21 +1253,25 @@ void printfile(node* p){
 	//optimize();
 }
 
-int getSize(Type p){
+int getSize(FieldList p){
 	int size = 0;
-	if(p->kind == Int||p->kind == Float)
+	if(p->type->kind == Int||p->type->kind == Float)
 		size = size + 4;
-	else if(p->kind == ARRAY){
-		size = getSize(p->array.elem);
-		size =  size * p->array.size;
+	else if(p->type->kind == ARRAY){
+		size = getArraySize(p);
 	}
 	else{
-		FieldList q = p->structure;
+		FieldList q = p->brother;
 		while(q!=NULL){
-			size = size + getSize(q->type);
+			size = size + getSize(q);
 			q = q->brother;
 		}
 	}
+	return size;
+}
+int getArraySize(Type p){
+	int size = getArraySize(p->array.elem);
+	size = size * p->array.size;
 	return size;
 }
 

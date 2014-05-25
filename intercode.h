@@ -82,7 +82,8 @@ void printf_CALL(InterCodes q);
 void printf_DEC(InterCodes q);
 void printf_ARG(InterCodes q);
 void show_all(char* output);
-int getSize(Type p);
+int getSize(FieldList p);
+int getArraySize(Type p);
 
 void optimize();
 Operand get_left(InterCodes codes);
