@@ -516,8 +516,7 @@ InterCodes translate_Exp(node* exp,Operand place){
 
 	//--------------------------------------------------LP Exp RP
 	else if(exp->exp_type == 15){
-		Operand t = new_temp();
-		return translate_Exp(exp->child->brother,t);
+		return translate_Exp(exp->child->brother,place);
 	}
 
 	//--------------------------------------------------MINUS Exp
