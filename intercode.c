@@ -530,8 +530,8 @@ InterCodes translate_Exp(node* exp,Operand place){
 		codes2->code = new_interCode(SUB);
 		codes2->code->binop.result = place;
 		t1->is_min = 1;
-		codes2->code->binop.left = new_operand(1,0);
-		codes2->code->binop.right = t1;
+		codes2->code->binop.op1 = new_operand(1,0);
+		codes2->code->binop.op2 = t1;
 
 		InterCodes_link(codes1,codes2);
 		return codes1;
@@ -985,7 +985,7 @@ InterCodes translate_Fundec(node* Fundec){
 	node* ID = Fundec->child;
 	InterCodes code1 = InterCodes_init();
 	code1->code = new_interCode(FUNC_I);
-	code1->code->onlyop.op = new_operand_name(ID->node_value);printf("name:    %s\n",ID->node_value);
+	code1->code->onlyop.op = new_operand_name(ID->node_value);
 	if(strcmp(ID->brother->brother->name,"VarList") == 0){			//ID LP VarList RP
 		FieldList p = Findname(ID->node_value);
 		FuncVar *q = p->type->func.brother;
